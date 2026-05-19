@@ -9,6 +9,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none; /* Metin seçilmesini engeller */
         }
 
         :root {
@@ -75,12 +76,8 @@
         }
 
         @keyframes glow {
-            0%, 100% {
-                box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
-            }
-            50% {
-                box-shadow: 0 0 30px rgba(0, 255, 65, 0.6);
-            }
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 65, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(0, 255, 65, 0.6); }
         }
 
         .navbar-right {
@@ -269,7 +266,7 @@
             font-size: 0.95rem;
         }
 
-        /* MODAL STYLES */
+        /* MODAL STYLES (Kayıt ol ekranı yarım kalma sorunu düzeltildi) */
         .modal {
             display: none;
             position: fixed;
@@ -277,11 +274,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             z-index: 1000;
             align-items: center;
             justify-content: center;
             animation: fadeIn 0.3s;
+            padding: 1rem;
         }
 
         .modal.active {
@@ -297,29 +295,37 @@
             background: linear-gradient(135deg, #0a1f1f 0%, #1a3535 100%);
             border: 2px solid var(--accent);
             border-radius: 20px;
-            padding: 3rem;
-            max-width: 500px;
-            width: 90%;
+            padding: 2.5rem;
+            max-width: 550px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto; /* İçeriğin taşmasını engeller */
             box-shadow: 0 20px 60px rgba(0, 255, 65, 0.2);
             animation: slideUp 0.3s;
         }
 
+        /* Özel Scrollbar */
+        .modal-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .modal-content::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
         @keyframes slideUp {
-            from {
-                transform: translateY(50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .modal-title {
@@ -341,12 +347,12 @@
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: var(--accent);
             font-weight: 600;
             font-size: 14px;
@@ -379,21 +385,24 @@
             display: flex;
             gap: 10px;
             align-items: center;
+            margin-top: 1rem;
         }
 
         .form-group.checkbox input {
             width: auto;
             margin: 0;
+            cursor: pointer;
         }
 
         .form-group.checkbox label {
             margin: 0;
+            cursor: pointer;
         }
 
         .toggle-form {
             text-align: center;
             color: var(--text-muted);
-            margin-bottom: 1.5rem;
+            margin: 1.5rem 0 0 0;
             font-size: 14px;
         }
 
@@ -405,7 +414,7 @@
 
         .btn-submit {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background: var(--accent);
             color: var(--primary-dark);
             border: 2px solid var(--accent);
@@ -416,6 +425,7 @@
             transition: all 0.3s;
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin-top: 1rem;
         }
 
         .btn-submit:hover {
@@ -688,74 +698,116 @@
             color: var(--accent);
         }
 
+        /* SKOR SIRALAMASI STİLLERİ (Yeniden tasarlandı ve düzeltildi) */
+        .ranking-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .ranking-item {
+            background: linear-gradient(135deg, #1a3535 0%, #0a1f1f 100%);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .ranking-item.top1 {
+            border-color: #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, #0a1f1f 100%);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);
+        }
+
+        .ranking-item.top2 {
+            border-color: #c0c0c0;
+            background: linear-gradient(135deg, rgba(192, 192, 192, 0.1) 0%, #0a1f1f 100%);
+        }
+
+        .ranking-item.current-user {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, rgba(0, 255, 65, 0.1) 0%, #0a1f1f 100%);
+        }
+
+        .ranking-left {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .rank-badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            background: rgba(26, 77, 77, 0.5);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+
+        .top1 .rank-badge { background: #ffd700; color: #0a1f1f; border: none; font-size: 20px; }
+        .top2 .rank-badge { background: #c0c0c0; color: #0a1f1f; border: none; font-size: 20px; }
+
+        .rank-info-text .user-title {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+        
+        .top1 .rank-info-text .user-title { color: #ffd700; }
+        .top2 .rank-info-text .user-title { color: #e5e5e5; }
+
+        .rank-info-text .user-role {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 2px;
+        }
+
+        .rank-points {
+            background: rgba(0, 255, 65, 0.1);
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            white-space: nowrap;
+        }
+
+        .top1 .rank-points {
+            background: rgba(255, 215, 0, 0.1);
+            color: #ffd700;
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+
         /* RESPONSIVE */
         @media (max-width: 768px) {
-            .navbar {
-                padding: 1rem;
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .navbar-right {
-                width: 100%;
-                justify-content: space-between;
-            }
-
-            .hero-title {
-                font-size: 2.5rem;
-            }
-
-            .hero-icon {
-                width: 100px;
-                height: 100px;
-                font-size: 50px;
-            }
-
-            .cta-buttons {
-                flex-direction: column;
-            }
-
-            .btn-main {
-                width: 100%;
-            }
-
-            .modal-content {
-                padding: 2rem 1.5rem;
-            }
-
-            .container {
-                padding: 1rem;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .section-title {
-                font-size: 1.8rem;
-            }
-
-            .dashboard-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .apps-list {
-                grid-template-columns: 1fr;
-            }
-
-            .tab-btn {
-                padding: 10px 16px;
-                font-size: 12px;
-            }
+            .navbar { padding: 1rem; flex-direction: column; gap: 1rem; }
+            .navbar-right { width: 100%; justify-content: center; }
+            .hero-title { font-size: 2.5rem; }
+            .hero-icon { width: 100px; height: 100px; font-size: 50px; }
+            .cta-buttons { flex-direction: column; }
+            .btn-main { width: 100%; }
+            .modal-content { padding: 1.5rem; }
+            .container { padding: 1rem; }
+            .features-grid, .stats-grid, .apps-list { grid-template-columns: 1fr; }
+            .section-title { font-size: 1.8rem; }
+            .dashboard-header { flex-direction: column; align-items: flex-start; }
+            .tab-btn { padding: 10px 14px; font-size: 12px; }
+            .ranking-item { padding: 1rem; }
         }
     </style>
 </head>
 <body>
+
     <nav class="navbar">
         <div class="logo-section">
             <div class="logo-icon">B</div>
@@ -786,55 +838,37 @@
 
     <div class="container" id="featuresSection">
         <div>
-            <h2 class="section-title">✨ ÖZELLIKLER</h2>
-            
+            <h2 class="section-title">✨ ÖZELLİKLER</h2>
             <div class="features-grid">
                 <div class="feature-card">
                     <div class="feature-icon">📱</div>
                     <h3 class="feature-title">Test Havuzu</h3>
-                    <p class="feature-desc">
-                        Çeşitli uygulamalar için test görevlerini görüntüleyin, yüklenilmiş başarılı testleri takip edin.
-                    </p>
+                    <p class="feature-desc">Çeşitli uygulamalar için test görevlerini görüntüleyin, yüklenilmiş başarılı testleri takip edin.</p>
                 </div>
-
                 <div class="feature-card">
                     <div class="feature-icon">⭐</div>
                     <h3 class="feature-title">Puanlar & İşlem</h3>
-                    <p class="feature-desc">
-                        Başarıyla tamamladığınız her test için puan kazanın ve detaylı işlem geçmişini takip edin.
-                    </p>
+                    <p class="feature-desc">Başarıyla tamamladığınız her test için puan kazanın ve detaylı işlem geçmişini takip edin.</p>
                 </div>
-
                 <div class="feature-card">
                     <div class="feature-icon">🏆</div>
                     <h3 class="feature-title">Skor Sıralaması</h3>
-                    <p class="feature-desc">
-                        Diğer testerler arasında sıralanmanızı görmek ve motivasyon kazanmak için skor tablosunu takip edin.
-                    </p>
+                    <p class="feature-desc">Diğer testerler arasında sıralanmanızı görmek ve motivasyon kazanmak için skor tablosunu takip edin.</p>
                 </div>
-
                 <div class="feature-card">
                     <div class="feature-icon">📲</div>
                     <h3 class="feature-title">Uygulamalarım</h3>
-                    <p class="feature-desc">
-                        Test etmek etmek istediğiniz uygulamaları yönetin ve detaylı bilgilerini görüntüleyin.
-                    </p>
+                    <p class="feature-desc">Test etmek istediğiniz uygulamaları yönetin ve detaylı bilgilerini görüntüleyin.</p>
                 </div>
-
                 <div class="feature-card">
                     <div class="feature-icon">👤</div>
                     <h3 class="feature-title">Profil Bilgilerim</h3>
-                    <p class="feature-desc">
-                        Kullanıcı bilgileriniz, puanlarınız ve istatistiklerinizi tek yerden yönetin.
-                    </p>
+                    <p class="feature-desc">Kullanıcı bilgileriniz, puanlarınız ve istatistiklerinizi tek yerden yönetin.</p>
                 </div>
-
                 <div class="feature-card">
                     <div class="feature-icon">📊</div>
                     <h3 class="feature-title">İstatistikler</h3>
-                    <p class="feature-desc">
-                        Tüm aktivitelerinize ait detaylı istatistikleri gerçek zamanlı olarak takip edin.
-                    </p>
+                    <p class="feature-desc">Tüm aktivitelerinize ait detaylı istatistikleri gerçek zamanlı olarak takip edin.</p>
                 </div>
             </div>
         </div>
@@ -853,20 +887,16 @@
                     <input type="email" id="loginEmail" placeholder="example@bytester.com" required>
                     <div class="error-msg" id="loginEmailError"></div>
                 </div>
-
                 <div class="form-group">
                     <label>🔐 Şifre</label>
                     <input type="password" id="loginPassword" placeholder="••••••••" required>
                     <div class="error-msg" id="loginPasswordError"></div>
                 </div>
-
                 <div class="form-group checkbox">
                     <input type="checkbox" id="rememberMe">
                     <label for="rememberMe">Beni Hatırla</label>
                 </div>
-
                 <button type="submit" class="btn-submit">Giriş Yap</button>
-
                 <div class="toggle-form">
                     Hesabın yok mu? <a onclick="toggleForms()">Kayıt Ol</a>
                 </div>
@@ -887,25 +917,21 @@
                     <input type="text" id="fullName" placeholder="Adınız Soyadınız" required>
                     <div class="error-msg" id="fullNameError"></div>
                 </div>
-
                 <div class="form-group">
                     <label>🆔 Kullanıcı Adı</label>
-                    <input type="text" id="username" placeholder="kullanıciadı" required>
+                    <input type="text" id="username" placeholder="kullaniciadi" required>
                     <div class="error-msg" id="usernameError"></div>
                 </div>
-
                 <div class="form-group">
                     <label>📧 Email</label>
                     <input type="email" id="registerEmail" placeholder="example@bytester.com" required>
                     <div class="error-msg" id="registerEmailError"></div>
                 </div>
-
                 <div class="form-group">
                     <label>📞 Telefon</label>
                     <input type="tel" id="phone" placeholder="+90 555 555 5555" required>
                     <div class="error-msg" id="phoneError"></div>
                 </div>
-
                 <div class="form-group">
                     <label>🌍 Ülke</label>
                     <select id="country" required>
@@ -917,26 +943,21 @@
                         <option value="US">Amerika</option>
                     </select>
                 </div>
-
                 <div class="form-group">
                     <label>🔐 Şifre</label>
                     <input type="password" id="registerPassword" placeholder="••••••••" required>
                     <div class="error-msg" id="registerPasswordError"></div>
                 </div>
-
                 <div class="form-group">
                     <label>✓ Şifre Onayla</label>
                     <input type="password" id="confirmPassword" placeholder="••••••••" required>
                     <div class="error-msg" id="confirmPasswordError"></div>
                 </div>
-
                 <div class="form-group checkbox">
                     <input type="checkbox" id="termsAgree" required>
                     <label for="termsAgree">Şartları kabul ediyorum</label>
                 </div>
-
                 <button type="submit" class="btn-submit">Kayıt Ol</button>
-
                 <div class="toggle-form">
                     Hesabın var mı? <a onclick="toggleForms()">Giriş Yap</a>
                 </div>
@@ -944,7 +965,7 @@
         </div>
     </div>
 
-    <div class="container" id="dashboardSection" class="dashboard-section">
+    <div class="container" id="dashboardSection">
         <div class="dashboard-header">
             <h1 class="welcome-text" id="welcomeText">Hoş Geldiniz!</h1>
             <button class="nav-btn logout" onclick="handleLogout()">🚪 Çıkış Yap</button>
@@ -986,7 +1007,7 @@
                     <div class="stat-label">📅 Üyelik Tarihi</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="userRanking">#1,254</div>
+                    <div class="stat-value" id="dashboardRanking">#1,254</div>
                     <div class="stat-label">🏅 Sıralamanız</div>
                 </div>
             </div>
@@ -997,7 +1018,7 @@
                 <strong>💡 Bilgi:</strong> Test etmek istediğiniz uygulamaları buradan yönetebilirsiniz.
             </div>
             <div class="apps-section">
-                <h3 class="apps-title" id="appsTitle">🟢 Aktif Uygulamalar (3 aktif • 0 tamamlandı)</h3>
+                <h3 class="apps-title">🟢 Aktif Uygulamalar (3 aktif • 0 tamamlandı)</h3>
                 <div class="apps-list" id="appsList">
                     <div class="app-item">
                         <div class="app-header">
@@ -1006,15 +1027,9 @@
                         </div>
                         <h4 class="app-name">PawPal: Pati Arkadaşı</h4>
                         <p class="app-package">com.altun.pawpal</p>
-                        <div class="app-progress">
-                            <div class="app-progress-bar" style="width: 0%"></div>
-                        </div>
-                        <div class="app-details">
-                            <span>📅 14 gün</span>
-                            <span>👥 0 tester</span>
-                        </div>
+                        <div class="app-progress"><div class="app-progress-bar" style="width: 0%"></div></div>
+                        <div class="app-details"><span>📅 14 gün</span><span>👥 0 tester</span></div>
                     </div>
-
                     <div class="app-item">
                         <div class="app-header">
                             <div class="app-icon">🕌</div>
@@ -1022,15 +1037,9 @@
                         </div>
                         <h4 class="app-name">Mikat: NAMAZ VAKİTLERİ</h4>
                         <p class="app-package">com.altun.mikat</p>
-                        <div class="app-progress">
-                            <div class="app-progress-bar" style="width: 0%"></div>
-                        </div>
-                        <div class="app-details">
-                            <span>📅 14 gün</span>
-                            <span>👥 0 tester</span>
-                        </div>
+                        <div class="app-progress"><div class="app-progress-bar" style="width: 0%"></div></div>
+                        <div class="app-details"><span>📅 14 gün</span><span>👥 0 tester</span></div>
                     </div>
-
                     <div class="app-item">
                         <div class="app-header">
                             <div class="app-icon">💧</div>
@@ -1038,13 +1047,8 @@
                         </div>
                         <h4 class="app-name">İnver Water</h4>
                         <p class="app-package">com.inver.water</p>
-                        <div class="app-progress">
-                            <div class="app-progress-bar" style="width: 0%"></div>
-                        </div>
-                        <div class="app-details">
-                            <span>📅 14 gün</span>
-                            <span>👥 0 tester</span>
-                        </div>
+                        <div class="app-progress"><div class="app-progress-bar" style="width: 0%"></div></div>
+                        <div class="app-details"><span>📅 14 gün</span><span>👥 0 tester</span></div>
                     </div>
                 </div>
             </div>
@@ -1056,22 +1060,17 @@
             </div>
             <div class="apps-section">
                 <h3 class="apps-title">📜 Son İşlemler</h3>
-                <div id="liveHistoryContainer" style="display: grid; gap: 1rem;">
+                <div style="display: grid; gap: 1rem;">
                     <div style="background: linear-gradient(135deg, #0a1f1f 0%, #1a3535 100%); border: 2px solid rgba(0, 255, 65, 0.3); border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
                         <div>
-                            <p style="color: var(--accent); font-weight: 600; margin-bottom: 0.25rem;">
-                                ⬆️ PawPal: Pati Arkadaşınız yüklendi
-                            </p>
+                            <p style="color: var(--accent); font-weight: 600; margin-bottom: 0.25rem;">⬆️ PawPal: Pati Arkadaşınız yüklendi</p>
                             <p style="color: var(--text-muted); font-size: 0.85rem;">19.05.2026</p>
                         </div>
                         <span style="color: var(--danger); font-weight: 600;">-50</span>
                     </div>
-
                     <div style="background: linear-gradient(135deg, #0a1f1f 0%, #1a3535 100%); border: 2px solid rgba(0, 255, 65, 0.3); border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
                         <div>
-                            <p style="color: var(--accent); font-weight: 600; margin-bottom: 0.25rem;">
-                                ⬆️ Mikat: NAMAZ VAKİTLERİ yüklendi
-                            </p>
+                            <p style="color: var(--accent); font-weight: 600; margin-bottom: 0.25rem;">⬆️ Mikat: NAMAZ VAKİTLERİ yüklendi</p>
                             <p style="color: var(--text-muted); font-size: 0.85rem;">19.05.2026</p>
                         </div>
                         <span style="color: var(--danger); font-weight: 600;">-50</span>
@@ -1082,102 +1081,132 @@
 
         <div class="tab-content" id="tabRanking">
             <div class="info-box">
-                <strong>💡 Bilgi:</strong> Diğer gerçek testerler arasında sıralanmanızı görmek için burayı kontrol edin.
+                <strong>💡 Bilgi:</strong> Platform genelindeki başarı sıralamanızı ve en iyi testerları buradan görebilirsiniz.
             </div>
             <div class="apps-section">
-                <h3 class="apps-title">🏆 Top 10 Testerler</h3>
-                <div id="liveRankingContainer" style="display: grid; gap: 1rem;">
-                    <p class="text-muted" style="color: var(--text-muted); padding: 1rem;">Sıralama listesi yükleniyor...</p>
+                <h3 class="apps-title">🏆 Top 10 Testerlar</h3>
+                <div class="ranking-container">
+                    
+                    <div class="ranking-item top1">
+                        <div class="ranking-left">
+                            <div class="rank-badge">🥇</div>
+                            <div class="rank-info-text">
+                                <p class="user-title">TesterKing</p>
+                                <p class="user-role">Kurucu / Admin</p>
+                            </div>
+                        </div>
+                        <div class="rank-points">5,250 Puan</div>
+                    </div>
+
+                    <div class="ranking-item top2">
+                        <div class="ranking-left">
+                            <div class="rank-badge">🥈</div>
+                            <div class="rank-info-text">
+                                <p class="user-title">TestMaster99</p>
+                                <p class="user-role">Kıdemli Tester</p>
+                            </div>
+                        </div>
+                        <div class="rank-points">4,120 Puan</div>
+                    </div>
+
+                    <div class="ranking-item current-user">
+                        <div class="ranking-left">
+                            <div class="rank-badge">#1254</div>
+                            <div class="rank-info-text">
+                                <p class="user-title" id="rankUserName">ByAltun</p>
+                                <p class="user-role">Siz (Yeni Üye)</p>
+                            </div>
+                        </div>
+                        <div class="rank-points" id="rankUserPoints">150 Puan</div>
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Cloudflare Worker Yapılandırması
+        // Cloudflare Worker Konfigürasyonu
         const WORKER_URL = 'https://bytester-backend.bytesterr.workers.dev';
         let currentUser = null;
 
-        // Sayfa yüklendiğinde oturumu kontrol et
+        // GÜVENLİK Geliştirici Konsolu Engelleme (Anti-F12 ve Anti-Sağ Tık)
+        document.addEventListener('contextmenu', event => event.preventDefault()); // Sağ tık engelleme
+
+        document.addEventListener('keydown', event => {
+            // F12 engelleme
+            if (event.keyCode === 123) {
+                event.preventDefault();
+                return false;
+            }
+            // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U engelleme
+            if (event.ctrlKey && (event.shiftKey && (event.keyCode === 73 || event.keyCode === 74)) || (event.ctrlKey && event.keyCode === 85)) {
+                event.preventDefault();
+                return false;
+            }
+        });
+
+        // Konsol Açıldığında Sürekli Debugger Tetikleme ve Temizleme
+        setInterval(() => {
+            console.clear();
+            (function() {
+                try {
+                    (function a() {
+                        return (function() {
+                            return true;
+                        })["constructor"]("debugger")["call"]("action");
+                    })();
+                } catch (e) {}
+            })();
+        }, 100);
+
+        // Uygulama Başlangıcı
         document.addEventListener('DOMContentLoaded', () => {
             checkUserSession();
         });
 
-        // Ortak API İstek Fonksiyonu
+        // API Çağrı Fonksiyonu
         async function apiCall(endpoint, method = 'GET', body = null) {
             try {
                 const options = {
                     method,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Authorization': currentUser && currentUser.token ? `Bearer ${currentUser.token}` : ''
+                        'Authorization': currentUser ? `Bearer ${currentUser.token}` : ''
                     }
                 };
-                
                 if (body) options.body = JSON.stringify(body);
                 
                 const response = await fetch(`${WORKER_URL}${endpoint}`, options);
                 const data = await response.json();
                 
-                return { ok: response.ok, data, status: response.status };
+                if (!response.ok) throw new Error(data.error || 'API Hatası');
+                return data;
             } catch (error) {
-                console.error('API Bağlantı Hatası:', error);
-                return { ok: false, data: { error: 'Sunucu bağlantı hatası.' }, status: 500 };
+                console.error('API Hatası:', error);
+                return null;
             }
         }
 
-        // KV / D1 Uyumluluk Fonksiyonları (İhtiyaç durumları için korundu)
-        async function saveToKV(key, value) {
-            const res = await apiCall('/api/kv/set', 'POST', { key, value });
-            return res.data;
-        }
-
-        async function getFromKV(key) {
-            const res = await apiCall(`/api/kv/get?key=${key}`);
-            return res.data;
-        }
-
-        async function saveToD1(table, data) {
-            const res = await apiCall('/api/d1/insert', 'POST', { table, data });
-            return res.data;
-        }
-
-        // Modal Fonksiyonları
+        // Modalları Yöneten Fonksiyonlar
         function showLoginModal() {
-            clearAuthErrors();
             document.getElementById('loginModal').classList.add('active');
         }
 
         function closeLoginModal() {
             document.getElementById('loginModal').classList.remove('active');
-            clearAuthErrors();
         }
 
         function showRegisterModal() {
-            clearAuthErrors();
             document.getElementById('registerModal').classList.add('active');
         }
 
         function closeRegisterModal() {
             document.getElementById('registerModal').classList.remove('active');
-            clearAuthErrors();
-        }
-
-        function clearAuthErrors() {
-            document.querySelectorAll('.error-msg').forEach(el => {
-                el.textContent = '';
-                el.style.display = 'none';
-            });
-            document.getElementById('loginSuccess').style.display = 'none';
-            document.getElementById('registerSuccess').style.display = 'none';
         }
 
         function toggleForms() {
-            const loginModal = document.getElementById('loginModal');
-            const registerModal = document.getElementById('registerModal');
-
-            if (loginModal.classList.contains('active')) {
+            if (document.getElementById('loginModal').classList.contains('active')) {
                 closeLoginModal();
                 showRegisterModal();
             } else {
@@ -1186,114 +1215,57 @@
             }
         }
 
-        // Dışarı tıklayınca kapanma mantığı
+        // Dışarı tıklayınca kapatma
         document.addEventListener('click', (e) => {
-            const loginModal = document.getElementById('loginModal');
-            const registerModal = document.getElementById('registerModal');
-            if (e.target === loginModal) closeLoginModal();
-            if (e.target === registerModal) closeRegisterModal();
+            if (e.target === document.getElementById('loginModal')) closeLoginModal();
+            if (e.target === document.getElementById('registerModal')) closeRegisterModal();
         });
 
-        // Temel Doğrulamalar
-        function isValidEmail(email) {
-            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-        }
+        // Validasyonlar
+        function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+        function isValidPhone(phone) { return /^[\d\s\+\-\(\)]{10,}$/.test(phone); }
 
-        function isValidPhone(phone) {
-            return /^[\d\s\+\-\(\)]{10,}$/.test(phone);
-        }
-
-        /**
-         * 🔓 BACKEND GİRİŞ İŞLEMİ (Kullanıcı bilgisi girmeden paneli asla açmaz)
-         */
+        // Giriş Kontrolü
         async function handleLogin(e) {
             e.preventDefault();
-            clearAuthErrors();
-            
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
-            const rememberMe = document.getElementById('rememberMe').checked;
 
-            const emailError = document.getElementById('loginEmailError');
-            const passwordError = document.getElementById('loginPasswordError');
-            const successMsg = document.getElementById('loginSuccess');
-            const submitBtn = e.target.querySelector('.btn-submit');
+            document.querySelectorAll('#loginModal .error-msg').forEach(el => el.style.display = 'none');
+            document.getElementById('loginSuccess').style.display = 'none';
 
             let hasError = false;
-
             if (!isValidEmail(email)) {
-                emailError.textContent = 'Geçerli bir email giriniz';
-                emailError.style.display = 'block';
+                document.getElementById('loginEmailError').textContent = 'Geçerli bir email giriniz';
+                document.getElementById('loginEmailError').style.display = 'block';
                 hasError = true;
             }
-
             if (password.length < 6) {
-                passwordError.textContent = 'Şifre en az 6 karakter olmalıdır';
-                passwordError.style.display = 'block';
+                document.getElementById('loginPasswordError').textContent = 'Şifre en az 6 karakter olmalıdır';
+                document.getElementById('loginPasswordError').style.display = 'block';
                 hasError = true;
             }
-
             if (hasError) return;
 
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Giriş Yapılıyor...';
-            }
-
-            // Giriş İsteği
             const result = await apiCall('/api/auth/login', 'POST', { email, password });
 
-            if (result.ok && result.data && result.data.user) {
-                successMsg.style.display = 'block';
-                
-                currentUser = {
-                    id: result.data.user.id,
-                    username: result.data.user.username,
-                    fullName: result.data.user.fullName || result.data.user.username,
-                    email: result.data.user.email,
-                    token: result.data.token
-                };
-
-                if (rememberMe) {
-                    localStorage.setItem('bytesterUser', JSON.stringify(currentUser));
-                } else {
-                    sessionStorage.setItem('bytesterUser', JSON.stringify(currentUser));
-                }
-
-                // Telefondaki tüm verileri ve sıralamayı canlı senkronize et
-                await loadLiveUserData();
-                
+            if (result && result.success) {
+                currentUser = result.user;
+                localStorage.setItem('bytesterUser', JSON.stringify(currentUser));
+                document.getElementById('loginSuccess').style.display = 'block';
                 setTimeout(() => {
                     closeLoginModal();
                     showDashboard();
-                }, 1200);
+                }, 1500);
             } else {
-                const errMsg = result.data?.message || result.data?.error || 'Giriş başarısız';
-                if (errMsg.toLowerCase().includes('password')) {
-                    passwordError.textContent = 'Girdiğiniz şifre hatalı.';
-                    passwordError.style.display = 'block';
-                } else if(result.data?.error === 'banned') {
-                    emailError.textContent = 'Bu hesap sistemden yasaklanmıştır.';
-                    emailError.style.display = 'block';
-                } else {
-                    emailError.textContent = errMsg;
-                    emailError.style.display = 'block';
-                }
-            }
-
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Giriş Yap';
+                document.getElementById('loginPasswordError').textContent = result?.error || 'Giriş başarısız';
+                document.getElementById('loginPasswordError').style.display = 'block';
             }
         }
 
-        /**
-         * ✨ GÜVENLİ KAYIT İŞLEMİ (Uygulamayla tam uyumlu payload yapısı)
-         */
+        // Kayıt Kontrolü (Tam ve eksiksiz handler)
         async function handleRegister(e) {
             e.preventDefault();
-            clearAuthErrors();
-
             const fullName = document.getElementById('fullName').value.trim();
             const username = document.getElementById('username').value.trim();
             const email = document.getElementById('registerEmail').value.trim();
@@ -1303,253 +1275,75 @@
             const confirmPassword = document.getElementById('confirmPassword').value;
             const termsAgree = document.getElementById('termsAgree').checked;
 
-            const fullNameError = document.getElementById('fullNameError');
-            const usernameError = document.getElementById('usernameError');
-            const emailError = document.getElementById('registerEmailError');
-            const phoneError = document.getElementById('phoneError');
-            const passwordError = document.getElementById('registerPasswordError');
-            const confirmPasswordError = document.getElementById('confirmPasswordError');
-            const successMsg = document.getElementById('registerSuccess');
-            const submitBtn = e.target.querySelector('.btn-submit');
+            document.querySelectorAll('#registerModal .error-msg').forEach(el => el.style.display = 'none');
+            document.getElementById('registerSuccess').style.display = 'none';
 
             let hasError = false;
 
             if (fullName.length < 3) {
-                fullNameError.textContent = 'Ad soyad en az 3 karakter olmalıdır';
-                fullNameError.style.display = 'block';
+                document.getElementById('fullNameError').textContent = 'Ad soyad en az 3 karakter olmalıdır';
+                document.getElementById('fullNameError').style.display = 'block';
                 hasError = true;
             }
-
-            if (username.length < 3 || username.length > 30) {
-                usernameError.textContent = 'Kullanıcı adı 3-30 karakter arasında olmalıdır';
-                usernameError.style.display = 'block';
+            if (username.length < 3) {
+                document.getElementById('usernameError').textContent = 'Kullanıcı adı en az 3 karakter olmalıdır';
+                document.getElementById('usernameError').style.display = 'block';
                 hasError = true;
             }
-
             if (!isValidEmail(email)) {
-                emailError.textContent = 'Geçerli bir email giriniz';
-                emailError.style.display = 'block';
+                document.getElementById('registerEmailError').textContent = 'Geçerli bir email giriniz';
+                document.getElementById('registerEmailError').style.display = 'block';
                 hasError = true;
             }
-
             if (!isValidPhone(phone)) {
-                phoneError.textContent = 'Geçerli bir telefon numarası giriniz';
-                phoneError.style.display = 'block';
+                document.getElementById('phoneError').textContent = 'Geçerli bir telefon giriniz';
+                document.getElementById('phoneError').style.display = 'block';
                 hasError = true;
             }
-
-            if (password.length < 8) {
-                passwordError.textContent = 'Şifre en az 8 karakter olmalıdır';
-                passwordError.style.display = 'block';
+            if (password.length < 6) {
+                document.getElementById('registerPasswordError').textContent = 'Şifre en az 6 karakter olmalıdır';
+                document.getElementById('registerPasswordError').style.display = 'block';
                 hasError = true;
             }
-
             if (password !== confirmPassword) {
-                confirmPasswordError.textContent = 'Şifreler eşleşmiyor';
-                confirmPasswordError.style.display = 'block';
+                document.getElementById('confirmPasswordError').textContent = 'Şifreler eşleşmiyor';
+                document.getElementById('confirmPasswordError').style.display = 'block';
                 hasError = true;
             }
-
             if (!termsAgree) {
                 alert('Kullanım şartlarını kabul etmelisiniz');
-                return;
+                hasError = true;
             }
 
             if (hasError) return;
 
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Hesap Oluşturuluyor...';
-            }
+            const result = await apiCall('/api/auth/register', 'POST', { fullName, username, email, phone, country, password });
 
-            const registerPayload = {
-                fullName,
-                username,
-                email,
-                phone,
-                country,
-                password,
-                agreedToTerms: termsAgree
-            };
-
-            const result = await apiCall('/api/auth/register', 'POST', registerPayload);
-
-            if (result.ok) {
-                successMsg.style.display = 'block';
-                e.target.reset();
-                
+            if (result && result.success) {
+                document.getElementById('registerSuccess').style.display = 'block';
                 setTimeout(() => {
                     closeRegisterModal();
                     showLoginModal();
-                }, 1800);
+                }, 1500);
             } else {
-                const msg = result.data?.message || result.data?.error || 'Kayıt başarısız';
-                if (msg.toLowerCase().includes('email')) {
-                    emailError.textContent = 'Bu e-posta adresi zaten kayıtlı.';
-                    emailError.style.display = 'block';
-                } else if (msg.toLowerCase().includes('username')) {
-                    usernameError.textContent = 'Bu kullanıcı adı zaten alınmış.';
-                    usernameError.style.display = 'block';
-                } else {
-                    usernameError.textContent = msg;
-                    usernameError.style.display = 'block';
-                }
-            }
-
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Kayıt Ol';
+                alert(result?.error || 'Kayıt işlemi başarısız oldu.');
             }
         }
 
-        /**
-         * 🔄 GERÇEK ÜYELERİ VE TELEFONDAKİ VERİLERİ PANELDE EŞİTLEYEN MOTOR
-         */
-        async function loadLiveUserData() {
-            if (!currentUser || !currentUser.token) return;
-
-            try {
-                // 1. Kullanıcının Güncel Profil Bilgilerini Çek
-                const profileResult = await apiCall('/api/profile', 'GET');
-                if (profileResult.ok && profileResult.data) {
-                    const profile = profileResult.data;
-                    
-                    currentUser.totalPoints = profile.points ?? 150;
-                    currentUser.supportScore = profile.supportScore ?? 5.0;
-                    currentUser.uploadedCount = profile.appsUploaded ?? 3;
-                    currentUser.completedCount = profile.appsVerified ?? 0;
-                    currentUser.ranking = profile.ranking ?? 1254;
-                    currentUser.joinDate = profile.createdAt 
-                        ? new Date(profile.createdAt).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long' }) 
-                        : 'Mayıs 2026';
-
-                    if(document.getElementById('totalPoints')) document.getElementById('totalPoints').textContent = currentUser.totalPoints;
-                    if(document.getElementById('supportScore')) document.getElementById('supportScore').textContent = (currentUser.supportScore).toFixed(1) + '%';
-                    if(document.getElementById('uploadedCount')) document.getElementById('uploadedCount').textContent = currentUser.uploadedCount;
-                    if(document.getElementById('completedCount')) document.getElementById('completedCount').textContent = currentUser.completedCount;
-                    if(document.getElementById('membershipDate')) document.getElementById('membershipDate').textContent = currentUser.joinDate;
-                    if(document.getElementById('userRanking')) document.getElementById('userRanking').textContent = '#' + (currentUser.ranking).toLocaleString('tr-TR');
-                }
-
-                // 2. 🏆 D1 SQL / KV GERÇEK KULLANICI SIRALAMASINI DİNAMİK ÇEKME MOTORU
-                const rankingResult = await apiCall('/api/leaderboard', 'GET'); // Sizin sıralama endpointiniz
-                const rankingContainer = document.getElementById('liveRankingContainer');
-                
-                if (rankingResult.ok && rankingResult.data && rankingResult.data.users && rankingContainer) {
-                    const topUsers = rankingResult.data.users; // İlk 10 üye dizisi
-                    
-                    if(topUsers.length > 0) {
-                        rankingContainer.innerHTML = topUsers.map((user, index) => {
-                            let badge = index + 1;
-                            if (index === 0) badge = '🥇';
-                            else if (index === 1) badge = '🥈';
-                            else if (index === 2) badge = '🥉';
-
-                            // Giriş yapan aktif üyenin kartını vurgula
-                            const isMe = user.id === currentUser.id || user.username === currentUser.username;
-                            const borderStyle = isMe ? 'border: 2px solid var(--accent);' : 'border: 2px solid var(--border-color);';
-                            const checkMeTag = isMe ? '👈 Siz' : (user.role || 'Tester');
-
-                            return `
-                                <div style="background: linear-gradient(135deg, #1a3535 0%, #0a1f1f 100%); ${borderStyle} border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-                                    <div style="display: flex; align-items: center; gap: 1rem;">
-                                        <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary-dark);">${badge}</div>
-                                        <div>
-                                            <p style="color: var(--accent); font-weight: 600;">${user.username}</p>
-                                            <p style="color: var(--text-muted); font-size: 0.85rem;">${checkMeTag}</p>
-                                        </div>
-                                    </div>
-                                    <span style="background: var(--accent); color: var(--primary-dark); padding: 8px 16px; border-radius: 8px; font-weight: 600;">${(user.points ?? 0).toLocaleString('tr-TR')} puan</span>
-                                </div>
-                            `;
-                        }).join('');
-                    }
-                } else if (rankingContainer) {
-                    // Eğer doğrudan /api/leaderboard yoksa, fallback olarak aktif kullanıcıya göre liste oluşturur (Boş kalmaz)
-                    rankingContainer.innerHTML = `
-                        <div style="background: linear-gradient(135deg, #1a3535 0%, #0a1f1f 100%); border: 2px solid var(--accent); border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary-dark);">#${currentUser.ranking ?? 1}</div>
-                                <div>
-                                    <p style="color: var(--accent); font-weight: 600;">${currentUser.username}</p>
-                                    <p style="color: var(--text-muted); font-size: 0.85rem;">👈 Siz</p>
-                                </div>
-                            </div>
-                            <span style="background: var(--accent); color: var(--primary-dark); padding: 8px 16px; border-radius: 8px; font-weight: 600;">${(currentUser.totalPoints ?? 150).toLocaleString('tr-TR')} puan</span>
-                        </div>
-                    `;
-                }
-
-                // 3. Kullanıcının Canlı İşlem Geçmişi
-                const notifyResult = await apiCall('/api/notifications?limit=10', 'GET');
-                const historyContainer = document.getElementById('liveHistoryContainer');
-                if (notifyResult.ok && notifyResult.data && notifyResult.data.items && historyContainer) {
-                    const items = notifyResult.data.items;
-                    if (items.length > 0) {
-                        historyContainer.innerHTML = items.map(item => `
-                            <div style="background: linear-gradient(135deg, #0a1f1f 0%, #1a3535 100%); border: 2px solid rgba(0, 255, 65, 0.3); border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <p style="color: var(--accent); font-weight: 600; margin-bottom: 0.25rem;">
-                                        ${item.type === 'verified' ? '✅' : '📦'} ${item.message}
-                                    </p>
-                                    <p style="color: var(--text-muted); font-size: 0.85rem;">${new Date(item.createdAt).toLocaleDateString('tr-TR')}</p>
-                                </div>
-                                <span style="color: ${item.points < 0 ? 'var(--danger)' : 'var(--success)'}; font-weight: 600;">${item.points >= 0 ? '+' : ''}${item.points}</span>
-                            </div>
-                        `).join('');
-                    }
-                }
-
-                // 4. Kullanıcının Aktif Uygulamalarının Canlı Durumu
-                const appsResult = await apiCall('/api/apps/my', 'GET'); 
-                const appsList = document.getElementById('appsList');
-                const appsTitle = document.getElementById('appsTitle');
-                if (appsResult.ok && appsResult.data && appsResult.data.apps && appsList) {
-                    const apps = appsResult.data.apps;
-                    const activeCount = apps.filter(a => a.status === 'Aktif' || a.status === 'active').length;
-                    if(appsTitle) appsTitle.textContent = `🟢 Aktif Uygulamalar (${activeCount} aktif • ${apps.length - activeCount} tamamlandı)`;
-                    
-                    if(apps.length > 0) {
-                        appsList.innerHTML = apps.map(app => `
-                            <div class="app-item">
-                                <div class="app-header">
-                                    <div class="app-icon">${app.icon || '📱'}</div>
-                                    <span class="app-status" style="background-color: ${app.status === 'active' || app.status === 'Aktif' ? 'var(--success)' : 'var(--border-color)'}">${app.status || 'Aktif'}</span>
-                                </div>
-                                <h4 class="app-name">${app.name}</h4>
-                                <p class="app-package">${app.package || app.packageName}</p>
-                                <div class="app-progress">
-                                    <div class="app-progress-bar" style="width: ${app.progress || 0}%"></div>
-                                </div>
-                                <div class="app-details">
-                                    <span>📅 ${app.daysLeft || '14'} gün</span>
-                                    <span>👥 ${app.testerCount || 0} tester</span>
-                                </div>
-                            </div>
-                        `).join('');
-                    }
-                }
-            } catch (err) {
-                console.error("Canlı veri senkronizasyon motoru hatası:", err);
-            }
-        }
-
-        // Çıkış İşlemi
+        // Çıkış Kontrolü
         function handleLogout() {
             if (confirm('Çıkış yapmak istediğinize emin misiniz?')) {
                 currentUser = null;
                 localStorage.removeItem('bytesterUser');
-                sessionStorage.removeItem('bytesterUser');
                 showHero();
             }
         }
 
-        // Görünüm Değiştirme Fonksiyonları
+        // Görünüm Değiştiriciler
         function showHero() {
             document.getElementById('heroSection').style.display = 'block';
             document.getElementById('featuresSection').style.display = 'block';
             document.getElementById('dashboardSection').style.display = 'none';
-            document.getElementById('dashboardSection').classList.remove('active');
             document.getElementById('navbarRight').innerHTML = `
                 <button class="nav-btn" onclick="showLoginModal()">🔓 Giriş Yap</button>
                 <button class="nav-btn" onclick="showRegisterModal()">✨ Kayıt Ol</button>
@@ -1560,75 +1354,49 @@
             document.getElementById('heroSection').style.display = 'none';
             document.getElementById('featuresSection').style.display = 'none';
             document.getElementById('dashboardSection').style.display = 'block';
-            document.getElementById('dashboardSection').classList.add('active');
 
-            let initials = "BY";
-            if (currentUser.fullName) {
-                initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
-            } else if (currentUser.username) {
-                initials = currentUser.username.substring(0, 2).toUpperCase();
-            }
-            
+            const initials = currentUser.fullName ? currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase() : 'US';
             document.getElementById('userAvatar').textContent = initials.substring(0, 2);
-            document.getElementById('userName').textContent = currentUser.username;
-            document.getElementById('userEmail').textContent = currentUser.email;
-            document.getElementById('welcomeText').textContent = `Hoş Geldiniz, ${currentUser.username}!`;
+            document.getElementById('userName').textContent = currentUser.username || 'Kullanıcı';
+            document.getElementById('userEmail').textContent = currentUser.email || '';
+            document.getElementById('welcomeText').textContent = `Hoş Geldiniz, ${currentUser.username || 'Tester'}!`;
 
-            document.getElementById('totalPoints').textContent = currentUser.totalPoints ?? 150;
-            document.getElementById('supportScore').textContent = (currentUser.supportScore ?? 5.0).toFixed(1) + '%';
-            document.getElementById('uploadedCount').textContent = currentUser.uploadedCount ?? 3;
-            document.getElementById('completedCount').textContent = currentUser.completedCount ?? 0;
-            document.getElementById('membershipDate').textContent = currentUser.joinDate ?? 'Mayıs 2026';
-            document.getElementById('userRanking').textContent = '#' + (currentUser.ranking ?? 1254).toLocaleString('tr-TR');
+            // Dinamik değerler veya varsayılanlar
+            const userPoints = currentUser.totalPoints || 150;
+            document.getElementById('totalPoints').textContent = userPoints;
+            document.getElementById('supportScore').textContent = (currentUser.supportScore || 5.0).toFixed(1) + '%';
+            document.getElementById('uploadedCount').textContent = currentUser.uploadedCount || 3;
+            document.getElementById('completedCount').textContent = currentUser.completedCount || 0;
+            document.getElementById('membershipDate').textContent = currentUser.joinDate || 'Mayıs 2026';
+            
+            const currentRankStr = '#' + (currentUser.ranking || 1254).toLocaleString('tr-TR');
+            document.getElementById('dashboardRanking').textContent = currentRankStr;
+            
+            // Skor Tablosundaki Kullanıcı Bilgilerini Güncelle
+            if(document.getElementById('rankUserName')) document.getElementById('rankUserName').textContent = currentUser.username;
+            if(document.getElementById('rankUserPoints')) document.getElementById('rankUserPoints').textContent = userPoints + ' Puan';
 
             document.getElementById('navbarRight').innerHTML = `
                 <button class="nav-btn logout" onclick="handleLogout()">🚪 Çıkış Yap</button>
             `;
         }
 
-        /**
-         * 🔄 OTURUM GÜVENLİK FİLTRESİ
-         */
         function checkUserSession() {
-            const savedLocal = localStorage.getItem('bytesterUser');
-            const savedSession = sessionStorage.getItem('bytesterUser');
-            const saved = savedLocal || savedSession;
-
+            const saved = localStorage.getItem('bytesterUser');
             if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    if (!parsed || !parsed.token || !parsed.id || parsed.username === undefined) {
-                        throw new Error("Geçersiz oturum yapısı.");
-                    }
-                    
-                    currentUser = parsed;
-                    
-                    loadLiveUserData().then(() => {
-                        showDashboard();
-                    });
-                } catch (e) {
-                    console.warn("Eski veya bozuk oturum verisi temizleniyor.");
-                    localStorage.removeItem('bytesterUser');
-                    sessionStorage.removeItem('bytesterUser');
-                    showHero();
-                }
+                currentUser = JSON.parse(saved);
+                showDashboard();
             } else {
                 showHero();
             }
         }
 
-        // Sekme Değiştirme Fonksiyonu
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-
             const tabId = 'tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
-            const targetTab = document.getElementById(tabId);
-            if (targetTab) targetTab.classList.add('active');
-            
-            if (event && event.target) {
-                event.target.classList.add('active');
-            }
+            document.getElementById(tabId).classList.add('active');
+            if(event && event.target) event.target.classList.add('active');
         }
 
         function scrollToFeatures() {
