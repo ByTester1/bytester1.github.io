@@ -1082,43 +1082,12 @@
 
         <div class="tab-content" id="tabRanking">
             <div class="info-box">
-                <strong>💡 Bilgi:</strong> Diğer testerler arasında sıralanmanızı görmek için burayı kontrol edin.
+                <strong>💡 Bilgi:</strong> Diğer gerçek testerler arasında sıralanmanızı görmek için burayı kontrol edin.
             </div>
             <div class="apps-section">
                 <h3 class="apps-title">🏆 Top 10 Testerler</h3>
                 <div id="liveRankingContainer" style="display: grid; gap: 1rem;">
-                    <div style="background: linear-gradient(135deg, #1a3535 0%, #0a1f1f 100%); border: 2px solid var(--accent); border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary-dark);">🥇</div>
-                            <div>
-                                <p style="color: var(--accent); font-weight: 600;">TesterKing</p>
-                                <p style="color: var(--text-muted); font-size: 0.85rem;">Admin</p>
-                            </div>
-                        </div>
-                        <span style="background: var(--accent); color: var(--primary-dark); padding: 8px 16px; border-radius: 8px; font-weight: 600;">5,250 puan</span>
-                    </div>
-
-                    <div style="background: linear-gradient(135deg, #1a3535 0%, #0a1f1f 100%); border: 2px solid var(--border-color); border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary-dark);">🥈</div>
-                            <div>
-                                <p style="color: var(--accent); font-weight: 600;">TestMaster99</p>
-                                <p style="color: var(--text-muted); font-size: 0.85rem;">Deneyimli</p>
-                            </div>
-                        </div>
-                        <span style="background: var(--accent); color: var(--primary-dark); padding: 8px 16px; border-radius: 8px; font-weight: 600;">4,120 puan</span>
-                    </div>
-
-                    <div style="background: linear-gradient(135deg, #1a3535 0%, #0a1f1f 100%); border: 2px solid var(--accent); border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary-dark);" id="userRankBadge">#1254</div>
-                            <div>
-                                <p style="color: var(--accent); font-weight: 600;" id="userRankName">ByAltun</p>
-                                <p style="color: var(--text-muted); font-size: 0.85rem;">👈 Siz</p>
-                            </div>
-                        </div>
-                        <span style="background: var(--accent); color: var(--primary-dark); padding: 8px 16px; border-radius: 8px; font-weight: 600;" id="userRankPoints">150 puan</span>
-                    </div>
+                    <p class="text-muted" style="color: var(--text-muted); padding: 1rem;">Sıralama listesi yükleniyor...</p>
                 </div>
             </div>
         </div>
@@ -1235,7 +1204,7 @@
         }
 
         /**
-         * 🔓 BACKEND GİRİŞ İŞLEMİ (Kullanıcı bilgisi girilmeden paneli asla açmaz)
+         * 🔓 BACKEND GİRİŞ İŞLEMİ (Kullanıcı bilgisi girmeden paneli asla açmaz)
          */
         async function handleLogin(e) {
             e.preventDefault();
@@ -1285,14 +1254,13 @@
                     token: result.data.token
                 };
 
-                // Tercihe göre saklama alanı seçimi
                 if (rememberMe) {
                     localStorage.setItem('bytesterUser', JSON.stringify(currentUser));
                 } else {
                     sessionStorage.setItem('bytesterUser', JSON.stringify(currentUser));
                 }
 
-                // Telefondaki tüm verileri web paneline senkronize et
+                // Telefondaki tüm verileri ve sıralamayı canlı senkronize et
                 await loadLiveUserData();
                 
                 setTimeout(() => {
@@ -1394,7 +1362,6 @@
                 submitBtn.textContent = 'Hesap Oluşturuluyor...';
             }
 
-            // Worker'ın tam kabul ettiği parametre eşleşmesi
             const registerPayload = {
                 fullName,
                 username,
@@ -1411,7 +1378,6 @@
                 successMsg.style.display = 'block';
                 e.target.reset();
                 
-                // Kayıt olan kullanıcıyı pürüzsüz giriş için Login formuna aktarır
                 setTimeout(() => {
                     closeRegisterModal();
                     showLoginModal();
@@ -1437,18 +1403,17 @@
         }
 
         /**
-         * 🔄 TELEFONDA YAPILAN TÜM GÜNCELLEMELERİ VE AYARLARI WEBE ÇEKEN SİSTEM
+         * 🔄 GERÇEK ÜYELERİ VE TELEFONDAKİ VERİLERİ PANELDE EŞİTLEYEN MOTOR
          */
         async function loadLiveUserData() {
             if (!currentUser || !currentUser.token) return;
 
             try {
-                // 1. Kullanıcının Güncel Profil ve İstatistik Verilerini Çek (/api/profile)
+                // 1. Kullanıcının Güncel Profil Bilgilerini Çek
                 const profileResult = await apiCall('/api/profile', 'GET');
                 if (profileResult.ok && profileResult.data) {
                     const profile = profileResult.data;
                     
-                    // Verileri currentUser nesnesine senkronize et
                     currentUser.totalPoints = profile.points ?? 150;
                     currentUser.supportScore = profile.supportScore ?? 5.0;
                     currentUser.uploadedCount = profile.appsUploaded ?? 3;
@@ -1458,20 +1423,64 @@
                         ? new Date(profile.createdAt).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long' }) 
                         : 'Mayıs 2026';
 
-                    // Arayüz elemanlarını canlı güncelle
                     if(document.getElementById('totalPoints')) document.getElementById('totalPoints').textContent = currentUser.totalPoints;
                     if(document.getElementById('supportScore')) document.getElementById('supportScore').textContent = (currentUser.supportScore).toFixed(1) + '%';
                     if(document.getElementById('uploadedCount')) document.getElementById('uploadedCount').textContent = currentUser.uploadedCount;
                     if(document.getElementById('completedCount')) document.getElementById('completedCount').textContent = currentUser.completedCount;
                     if(document.getElementById('membershipDate')) document.getElementById('membershipDate').textContent = currentUser.joinDate;
                     if(document.getElementById('userRanking')) document.getElementById('userRanking').textContent = '#' + (currentUser.ranking).toLocaleString('tr-TR');
-                    
-                    // Sıralama sekmesindeki "Siz" alanını güncelle
-                    if(document.getElementById('userRankPoints')) document.getElementById('userRankPoints').textContent = currentUser.totalPoints + " puan";
-                    if(document.getElementById('userRankBadge')) document.getElementById('userRankBadge').textContent = '#' + currentUser.ranking;
                 }
 
-                // 2. Kullanıcının Mobil/Web Canlı İşlem Geçmişi (/api/notifications)
+                // 2. 🏆 D1 SQL / KV GERÇEK KULLANICI SIRALAMASINI DİNAMİK ÇEKME MOTORU
+                const rankingResult = await apiCall('/api/leaderboard', 'GET'); // Sizin sıralama endpointiniz
+                const rankingContainer = document.getElementById('liveRankingContainer');
+                
+                if (rankingResult.ok && rankingResult.data && rankingResult.data.users && rankingContainer) {
+                    const topUsers = rankingResult.data.users; // İlk 10 üye dizisi
+                    
+                    if(topUsers.length > 0) {
+                        rankingContainer.innerHTML = topUsers.map((user, index) => {
+                            let badge = index + 1;
+                            if (index === 0) badge = '🥇';
+                            else if (index === 1) badge = '🥈';
+                            else if (index === 2) badge = '🥉';
+
+                            // Giriş yapan aktif üyenin kartını vurgula
+                            const isMe = user.id === currentUser.id || user.username === currentUser.username;
+                            const borderStyle = isMe ? 'border: 2px solid var(--accent);' : 'border: 2px solid var(--border-color);';
+                            const checkMeTag = isMe ? '👈 Siz' : (user.role || 'Tester');
+
+                            return `
+                                <div style="background: linear-gradient(135deg, #1a3535 0%, #0a1f1f 100%); ${borderStyle} border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary-dark);">${badge}</div>
+                                        <div>
+                                            <p style="color: var(--accent); font-weight: 600;">${user.username}</p>
+                                            <p style="color: var(--text-muted); font-size: 0.85rem;">${checkMeTag}</p>
+                                        </div>
+                                    </div>
+                                    <span style="background: var(--accent); color: var(--primary-dark); padding: 8px 16px; border-radius: 8px; font-weight: 600;">${(user.points ?? 0).toLocaleString('tr-TR')} puan</span>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                } else if (rankingContainer) {
+                    // Eğer doğrudan /api/leaderboard yoksa, fallback olarak aktif kullanıcıya göre liste oluşturur (Boş kalmaz)
+                    rankingContainer.innerHTML = `
+                        <div style="background: linear-gradient(135deg, #1a3535 0%, #0a1f1f 100%); border: 2px solid var(--accent); border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary-dark);">#${currentUser.ranking ?? 1}</div>
+                                <div>
+                                    <p style="color: var(--accent); font-weight: 600;">${currentUser.username}</p>
+                                    <p style="color: var(--text-muted); font-size: 0.85rem;">👈 Siz</p>
+                                </div>
+                            </div>
+                            <span style="background: var(--accent); color: var(--primary-dark); padding: 8px 16px; border-radius: 8px; font-weight: 600;">${(currentUser.totalPoints ?? 150).toLocaleString('tr-TR')} puan</span>
+                        </div>
+                    `;
+                }
+
+                // 3. Kullanıcının Canlı İşlem Geçmişi
                 const notifyResult = await apiCall('/api/notifications?limit=10', 'GET');
                 const historyContainer = document.getElementById('liveHistoryContainer');
                 if (notifyResult.ok && notifyResult.data && notifyResult.data.items && historyContainer) {
@@ -1491,7 +1500,7 @@
                     }
                 }
 
-                // 3. Kullanıcının Aktif Uygulamalarının Canlı Durumu (/api/apps veya uyumlu havuz)
+                // 4. Kullanıcının Aktif Uygulamalarının Canlı Durumu
                 const appsResult = await apiCall('/api/apps/my', 'GET'); 
                 const appsList = document.getElementById('appsList');
                 const appsTitle = document.getElementById('appsTitle');
@@ -1535,7 +1544,7 @@
             }
         }
 
-        // Görünüm Değiştirme Fonksiyonları (Orijinal yapı korundu)
+        // Görünüm Değiştirme Fonksiyonları
         function showHero() {
             document.getElementById('heroSection').style.display = 'block';
             document.getElementById('featuresSection').style.display = 'block';
@@ -1553,7 +1562,6 @@
             document.getElementById('dashboardSection').style.display = 'block';
             document.getElementById('dashboardSection').classList.add('active');
 
-            // İsim baş harflerini alma mantığı
             let initials = "BY";
             if (currentUser.fullName) {
                 initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
@@ -1566,15 +1574,12 @@
             document.getElementById('userEmail').textContent = currentUser.email;
             document.getElementById('welcomeText').textContent = `Hoş Geldiniz, ${currentUser.username}!`;
 
-            // Verileri yerleştir
             document.getElementById('totalPoints').textContent = currentUser.totalPoints ?? 150;
             document.getElementById('supportScore').textContent = (currentUser.supportScore ?? 5.0).toFixed(1) + '%';
             document.getElementById('uploadedCount').textContent = currentUser.uploadedCount ?? 3;
             document.getElementById('completedCount').textContent = currentUser.completedCount ?? 0;
             document.getElementById('membershipDate').textContent = currentUser.joinDate ?? 'Mayıs 2026';
             document.getElementById('userRanking').textContent = '#' + (currentUser.ranking ?? 1254).toLocaleString('tr-TR');
-            
-            if(document.getElementById('userRankName')) document.getElementById('userRankName').textContent = currentUser.username;
 
             document.getElementById('navbarRight').innerHTML = `
                 <button class="nav-btn logout" onclick="handleLogout()">🚪 Çıkış Yap</button>
@@ -1582,7 +1587,7 @@
         }
 
         /**
-         * 🔄 OTURUM GÜVENLİK FİLTRESİ (Sahte/boş açılışları kökten engeller)
+         * 🔄 OTURUM GÜVENLİK FİLTRESİ
          */
         function checkUserSession() {
             const savedLocal = localStorage.getItem('bytesterUser');
@@ -1592,19 +1597,17 @@
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
-                    // Hafızada token veya ID yoksa, ya da tanımsız bir yapıysa temizle ve dışarı at
                     if (!parsed || !parsed.token || !parsed.id || parsed.username === undefined) {
                         throw new Error("Geçersiz oturum yapısı.");
                     }
                     
                     currentUser = parsed;
                     
-                    // Canlı verileri arka planda güncelleyip paneli göster
                     loadLiveUserData().then(() => {
                         showDashboard();
                     });
                 } catch (e) {
-                    console.warn("Eski veya bozuk oturum verisi tespit edildi, temizleniyor.");
+                    console.warn("Eski veya bozuk oturum verisi temizleniyor.");
                     localStorage.removeItem('bytesterUser');
                     sessionStorage.removeItem('bytesterUser');
                     showHero();
@@ -1614,7 +1617,7 @@
             }
         }
 
-        // Sekme Değiştirme Fonksiyonu (Orijinal mantık)
+        // Sekme Değiştirme Fonksiyonu
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
