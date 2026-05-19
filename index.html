@@ -843,8 +843,7 @@
         </div>
     </div>
 
-    <!-- LOGIN MODAL -->
-    <div class="modal" id="loginModal">
+<div class="modal" id="loginModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">🔓 GİRİŞ YAP</h2>
@@ -878,7 +877,6 @@
         </div>
     </div>
 
-    <!-- REGISTER MODAL -->
     <div class="modal" id="registerModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -949,6 +947,252 @@
         </div>
     </div>
 
+    <script>
+        const WORKER_URL = 'https://bytester-backend.bytesterr.workers.dev';
+        let currentUser = null;
+
+        /**
+         * 🔓 MODAL KAPATMA VE HATA TEMİZLEME FONKSİYONLARI
+         */
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+            clearAuthErrors();
+        }
+
+        function closeRegisterModal() {
+            document.getElementById('registerModal').style.display = 'none';
+            clearAuthErrors();
+        }
+
+        function clearAuthErrors() {
+            // Tüm error-msg div'lerini ve başarı mesajlarını temizler
+            document.querySelectorAll('.error-msg').forEach(el => el.textContent = '');
+            document.getElementById('loginSuccess').style.display = 'none';
+            document.getElementById('registerSuccess').style.display = 'none';
+        }
+
+        /**
+         * 🔄 FORMLAR ARASI GEÇİŞ (Giriş Yap <-> Kayıt Ol)
+         */
+        function toggleForms() {
+            const loginModal = document.getElementById('loginModal');
+            const registerModal = document.getElementById('registerModal');
+            
+            clearAuthErrors();
+            
+            if (loginModal.style.display === 'none' || loginModal.style.display === '') {
+                loginModal.style.display = 'flex';
+                registerModal.style.display = 'none';
+            } else {
+                loginModal.style.display = 'none';
+                registerModal.style.display = 'flex';
+            }
+        }
+
+        /**
+         * 🔑 BACKEND GİRİŞ SÜRECİ (LOGIN)
+         */
+        async function handleLogin(event) {
+            if (event) event.preventDefault();
+            clearAuthErrors();
+
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            const emailError = document.getElementById('loginEmailError');
+            const passwordError = document.getElementById('loginPasswordError');
+            const successMsg = document.getElementById('loginSuccess');
+            const submitBtn = event.target.querySelector('.btn-submit');
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Giriş Yapılıyor...';
+            }
+
+            try {
+                const response = await fetch(`${WORKER_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    if (data.error === 'banned') {
+                        emailError.textContent = 'Bu hesap sistemden yasaklanmıştır.';
+                    } else if (data.message && data.message.toLowerCase().includes('password')) {
+                        passwordError.textContent = 'Girdiğiniz şifre hatalı.';
+                    } else {
+                        emailError.textContent = data.message || 'E-posta veya şifre hatalı.';
+                    }
+                    throw new Error(data.message || 'Giriş başarısız.');
+                }
+
+                // Giriş Başarılı
+                successMsg.style.display = 'block';
+                
+                currentUser = {
+                    id: data.user.id,
+                    username: data.user.username,
+                    email: data.user.email,
+                    points: data.user.points,
+                    supportScore: data.user.supportScore,
+                    uploadedCount: data.user.appsUploaded,
+                    completedCount: data.user.appsVerified,
+                    joinDate: new Date(data.user.createdAt).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long' }),
+                    token: data.token
+                };
+
+                // Beni Hatırla durumuna göre hafıza seçimi
+                if (rememberMe) {
+                    localStorage.setItem('bytesterUser', JSON.stringify(currentUser));
+                } else {
+                    sessionStorage.setItem('bytesterUser', JSON.stringify(currentUser));
+                }
+
+                setTimeout(() => {
+                    closeLoginModal();
+                    if (typeof showDashboard === 'function') {
+                        showDashboard();
+                    } else {
+                        window.location.reload();
+                    }
+                }, 1200);
+
+            } catch (error) {
+                console.error('Giriş Hatası:', error);
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Giriş Yap';
+                }
+            }
+        }
+
+        /**
+         * ✨ BACKEND KAYIT SÜRECİ (REGISTER)
+         */
+        async function handleRegister(event) {
+            if (event) event.preventDefault();
+            clearAuthErrors();
+
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const termsAgree = document.getElementById('termsAgree').checked;
+
+            const usernameError = document.getElementById('usernameError');
+            const emailError = document.getElementById('registerEmailError');
+            const passwordError = document.getElementById('registerPasswordError');
+            const confirmPasswordError = document.getElementById('confirmPasswordError');
+            const successMsg = document.getElementById('registerSuccess');
+            const submitBtn = event.target.querySelector('.btn-submit');
+
+            // Ön yüz kontrolleri (Worker kuralları ile tam eşleşen)
+            if (username.length < 3 || username.length > 30) {
+                usernameError.textContent = 'Kullanıcı adı 3-30 karakter arasında olmalıdır.';
+                return;
+            }
+
+            if (password.length < 8) {
+                passwordError.textContent = 'Şifre en az 8 karakter olmalıdır.';
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                confirmPasswordError.textContent = 'Şifreler uyuşmuyor, lütfen tekrar kontrol edin.';
+                return;
+            }
+
+            if (!termsAgree) {
+                alert('Devam etmek için şartları kabul etmelisiniz.');
+                return;
+            }
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Hesap Oluşturuluyor...';
+            }
+
+            try {
+                // Cloudflare Worker'ın beklediği veri yapısı (Payload)
+                const payload = {
+                    email: email,
+                    username: username,
+                    password: password,
+                    agreedToTerms: termsAgree
+                };
+
+                const response = await fetch(`${WORKER_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    // Çakışma durumlarını ilgili girdilerin altında gösteriyoruz
+                    if (data.message && data.message.toLowerCase().includes('email')) {
+                        emailError.textContent = 'Bu e-posta adresi zaten kayıtlı.';
+                    } else if (data.message && data.message.toLowerCase().includes('username')) {
+                        usernameError.textContent = 'Bu kullanıcı adı zaten alınmış.';
+                    } else {
+                        usernameError.textContent = data.message || 'Kayıt başarısız oldu.';
+                    }
+                    throw new Error(data.message || 'Kayıt hatası.');
+                }
+
+                // Kayıt Başarılı
+                successMsg.style.display = 'block';
+                event.target.reset();
+
+                // 2 saniye sonra otomatik giriş formuna yönlendir
+                setTimeout(() => {
+                    toggleForms();
+                }, 2000);
+
+            } catch (error) {
+                console.error('Kayıt Hatası:', error);
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Kayıt Ol';
+                }
+            }
+        }
+
+        /**
+         * 🔄 SAYFA YÜKLENDİĞİNDE OTURUM KONTROLÜ
+         */
+        function checkUserSession() {
+            const savedLocal = localStorage.getItem('bytesterUser');
+            const savedSession = sessionStorage.getItem('bytesterUser');
+            const saved = savedLocal || savedSession;
+
+            if (saved) {
+                currentUser = JSON.parse(saved);
+                if (typeof showDashboard === 'function') {
+                    showDashboard();
+                }
+            } else {
+                if (typeof showHero === 'function') {
+                    showHero();
+                }
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', checkUserSession);
+    </script>
     <!-- DASHBOARD SECTION -->
     <div class="container" id="dashboardSection">
         <div class="dashboard-header">
