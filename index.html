@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ByTester - Yazılım Test Yönetim Platformu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #00ff41;
+            --primary-dark: #0a1f1f;
+            --secondary-dark: #0f2e2e;
+            --bg-gradient: linear-gradient(135deg, #0a1f1f 0%, #1a3535 50%, #0d2d2d 100%);
+            --text-light: #ffffff;
+            --text-muted: #b0d4d4;
+            --border-color: #1a4d4d;
+            --accent: #00ff41;
+            --success: #4ade80;
+            --danger: #ff6b6b;
+            --warning: #fbbf24;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: rgba(10, 31, 31, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 255, 65, 0.1);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #1a4d4d, #0a1f1f);
+            border: 3px solid var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(0, 255, 65, 0.6);
+            }
+        }
+
+        .navbar-right {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            border: 2px solid var(--accent);
+            background: transparent;
+            color: var(--accent);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-btn:hover {
+            background: var(--accent);
+            color: var(--primary-dark);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.4);
+        }
+
+        .nav-btn.logout {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .nav-btn.logout:hover {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* HERO SECTION */
+        .hero-section {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, rgba(0, 255, 65, 0.05) 0%, rgba(26, 77, 77, 0.1) 100%);
+            border-radius: 20px;
+            margin-bottom: 4rem;
+            border: 2px solid var(--accent);
+            box-shadow: 0 8px 32px rgba(0, 255, 65, 0.1);
+        }
+
+        .hero-icon {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #1a4d4d 0%, #0a1f1f 100%);
+            border: 3px solid var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            font-size: 70px;
+            color: var(--accent);
+            box-shadow: 0 0 40px rgba(0, 255, 65, 0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            line-height: 1.8;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-main {
+            padding: 15px 40px;
+            border: 2px solid var(--accent);
+            background: var(--accent);
+            color: var(--primary-dark);
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-main:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 255, 65, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent);
+            color: var(--primary-dark);
+        }
+
+        /* FEATURES SECTION */
+        .features-section {
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(26, 77, 77, 0.3) 0%, rgba(15, 46, 46, 0.2) 100%);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, rgba(0, 255, 65, 0.1) 0%, rgba(26, 77, 77, 0.2) 100%);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 255, 65, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .feature-desc {
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* MODAL STYLES */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #0a1f1f 0%, #1a3535 100%);
+            border: 2px solid var(--accent);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 255, 65, 0.2);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            color: var(--accent);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 28px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover {
+            color: var(--accent);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(26, 77, 77, 0.3);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(0, 255, 65, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+        }
+
+        input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-group.checkbox {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .form-group.checkbox input {
+            width: auto;
+            margin: 0;
+        }
+
+        .form-group.checkbox label {
+            margin: 0;
+        }
+
+        .toggle-form {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            font-size: 14px;
+        }
+
+        .toggle-form a {
+            color: var(--accent);
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: var(--primary-dark);
+            border: 2px solid var(--accent);
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.4);
+        }
+
+        .error-msg {
+            color: var(--danger);
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .success-msg {
+            background: rgba(74, 222, 128, 0.1);
+            border: 2px solid var(--success);
+            color: var(--success);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        /* DASHBOARD */
+        .dashboard-section {
+            display: none;
+        }
+
+        .dashboard-section.active {
+            display: block;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .welcome-text {
+            font-size: 2rem;
+            color: var(--accent);
+            text-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+        }
+
+        .user-card {
+            background: linear-gradient(135deg, rgba(26, 77, 77, 0.3) 0%, rgba(15, 46, 46, 0.2) 100%);
+            border: 2px solid var(--accent);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 20px rgba(0, 255, 65, 0.1);
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #1a4d4d 0%, #0a1f1f 100%);
+            border: 3px solid var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 40px;
+            font-weight: bold;
+            color: var(--accent);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+        }
+
+        .user-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .user-email {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(26, 77, 77, 0.4) 0%, rgba(0, 255, 65, 0.05) 100%);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, rgba(0, 255, 65, 0.15) 0%, rgba(26, 77, 77, 0.3) 100%);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 255, 65, 0.2);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .apps-section {
+            background: linear-gradient(135deg, rgba(26, 77, 77, 0.3) 0%, rgba(15, 46, 46, 0.2) 100%);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 8px 20px rgba(0, 255, 65, 0.1);
+        }
+
+        .apps-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+        }
+
+        .apps-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .app-item {
+            background: linear-gradient(135deg, #0a1f1f 0%, #1a3535 100%);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .app-item:hover {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, rgba(0, 255, 65, 0.05) 0%, #1a3535 100%);
+            box-shadow: 0 8px 20px rgba(0, 255, 65, 0.15);
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .app-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #1a4d4d, #0a1f1f);
+            border: 2px solid var(--accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--accent);
+        }
+
+        .app-status {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--success);
+            color: var(--primary-dark);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .app-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .app-package {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .app-progress {
+            background: rgba(26, 77, 77, 0.5);
+            border-radius: 10px;
+            height: 6px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .app-progress-bar {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+
+        .app-details {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .info-box {
+            background: rgba(0, 255, 65, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .info-box strong {
+            color: var(--accent);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .navbar-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-icon {
+                width: 100px;
+                height: 100px;
+                font-size: 50px;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+
+            .btn-main {
+                width: 100%;
+            }
+
+            .modal-content {
+                padding: 2rem 1.5rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .apps-list {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-btn {
+                padding: 10px 16px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo-section">
+            <div class="logo-icon">B</div>
+            <span>BYTESTER</span>
+        </div>
+        <div class="navbar-right" id="navbarRight">
+            <button class="nav-btn" onclick="showLoginModal()">🔓 Giriş Yap</button>
+            <button class="nav-btn" onclick="showRegisterModal()">✨ Kayıt Ol</button>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <div class="container" id="heroSection">
+        <div class="hero-section">
+            <div class="hero-icon">⚗️</div>
+            <h1 class="hero-title">BYTESTER</h1>
+            <p class="hero-subtitle">Yazılım Test Yönetim Platformu</p>
+            <p class="hero-description">
+                ByTester, mobil ve web uygulamalarınızı profesyonel bir şekilde test etmek için tasarlanmış, 
+                kapsamlı bir yazılım test yönetim platformudur. Diğer geliştirici ve test uzmanlarıyla işbirliği yapın, 
+                puanlar kazanın ve skor tablosunda üst sıralara çıkın!
+            </p>
+            <div class="cta-buttons">
+                <button class="btn-main" onclick="showRegisterModal()">🚀 Hemen Başla</button>
+                <button class="btn-main btn-secondary" onclick="scrollToFeatures()">ℹ️ Daha Fazla Bilgi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FEATURES SECTION -->
+    <div class="container">
+        <div id="featuresSection">
+            <h2 class="section-title">✨ ÖZELLIKLER</h2>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3 class="feature-title">Test Havuzu</h3>
+                    <p class="feature-desc">
+                        Çeşitli uygulamalar için test görevlerini görüntüleyin, yüklenilmiş başarılı testleri takip edin.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⭐</div>
+                    <h3 class="feature-title">Puanlar & İşlem</h3>
+                    <p class="feature-desc">
+                        Başarıyla tamamladığınız her test için puan kazanın ve detaylı işlem geçmişini takip edin.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🏆</div>
+                    <h3 class="feature-title">Skor Sıralaması</h3>
+                    <p class="feature-desc">
+                        Diğer testerler arasında sıralanmanızı görmek ve motivasyon kazanmak için skor tablosunu takip edin.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📲</div>
+                    <h3 class="feature-title">Uygulamalarım</h3>
+                    <p class="feature-desc">
+                        Test etmek istediğiniz uygulamaları yönetin ve detaylı bilgilerini görüntüleyin.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">👤</div>
+                    <h3 class="feature-title">Profil Bilgilerim</h3>
+                    <p class="feature-desc">
+                        Kullanıcı bilgileriniz, puanlarınız ve istatistiklerinizi tek yerden yönetin.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">İstatistikler</h3>
+                    <p class="feature-desc">
+                        Tüm aktivitelerinize ait detaylı istatistikleri gerçek zamanlı olarak takip edin.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIN MODAL -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">🔓 GİRİŞ YAP</h2>
+                <button class="close-btn" onclick="closeLoginModal()">&times;</button>
+            </div>
+            <div class="success-msg" id="loginSuccess">✓ Giriş başarılı! Dashboard'a hoş geldiniz.</div>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>📧 Email</label>
+                    <input type="email" id="loginEmail" placeholder="example@bytester.com" required>
+                    <div class="error-msg" id="loginEmailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>🔐 Şifre</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
+                    <div class="error-msg" id="loginPasswordError"></div>
+                </div>
+
+                <div class="form-group checkbox">
+                    <input type="checkbox" id="rememberMe">
+                    <label for="rememberMe">Beni Hatırla</label>
+                </div>
+
+                <button type="submit" class="btn-submit">Giriş Yap</button>
+
+                <div class="toggle-form">
+                    Hesabın yok mu? <a onclick="toggleForms()">Kayıt Ol</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- REGISTER MODAL -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">✨ KAYIT OL</h2>
+                <button class="close-btn" onclick="closeRegisterModal()">&times;</button>
+            </div>
+            <div class="success-msg" id="registerSuccess">✓ Kayıt başarılı! Giriş yapabilirsiniz.</div>
+            <form onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>👤 Ad Soyad</label>
+                    <input type="text" id="fullName" placeholder="Adınız Soyadınız" required>
+                    <div class="error-msg" id="fullNameError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>🆔 Kullanıcı Adı</label>
+                    <input type="text" id="username" placeholder="kullanıciadı" required>
+                    <div class="error-msg" id="usernameError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>📧 Email</label>
+                    <input type="email" id="registerEmail" placeholder="example@bytester.com" required>
+                    <div class="error-msg" id="registerEmailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>📞 Telefon</label>
+                    <input type="tel" id="phone" placeholder="+90 555 555 5555" required>
+                    <div class="error-msg" id="phoneError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>🌍 Ülke</label>
+                    <select id="country" required>
+                        <option value="">Ülke Seçin</option>
+                        <option value="TR">Türkiye</option>
+                        <option value="DE">Almanya</option>
+                        <option value="FR">Fransa</option>
+                        <option value="GB">İngiltere</option>
+                        <option value="US">Amerika</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>🔐 Şifre</label>
+                    <input type="password" id="registerPassword" placeholder="••••••••" required>
+                    <div class="error-msg" id="registerPasswordError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>✓ Şifre Onayla</label>
+                    <input type="password" id="confirmPassword" placeholder="••••••••" required>
+                    <div class="error-msg" id="confirmPasswordError"></div>
+                </div>
+
+                <div class="form-group checkbox">
+                    <input type="checkbox" id="termsAgree" required>
+                    <label for="termsAgree">Şartları kabul ediyorum</label>
+                </div>
+
+                <button type="submit" class="btn-submit">Kayıt Ol</button>
+
+                <div class="toggle-form">
+                    Hesabın var mı? <a onclick="toggleForms()">Giriş Yap</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- DASHBOARD SECTION -->
+    <div class="container" id="dashboardSection">
+        <div class="dashboard-header">
+            <h1 class="welcome-text" id="welcomeText">Hoş Geldiniz!</h1>
+            <button class="nav-btn logout" onclick="handleLogout()">🚪 Çıkış Yap</button>
+        </div>
+
+        <!-- USER CARD -->
+        <div class="user-card">
+            <div class="avatar" id="userAvatar">BA</div>
+            <p class="user-name" id="userName">ByAltun</p>
+            <p class="user-email" id="userEmail">byaltun@bytester.com</p>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('overview')">📊 Genel Bakış</button>
+            <button class="tab-btn" onclick="switchTab('apps')">📱 Uygulamalarım</button>
+            <button class="tab-btn" onclick="switchTab('history')">📜 İşlem Geçmişi</button>
+            <button class="tab-btn" onclick="switchTab('ranking')">🏆 Sıralama</button>
+        </div>
+
+        <!-- TAB: OVERVIEW -->
+        <div class="tab-content active" id="tabOverview">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalPoints">150</div>
+                    <div class="stat-label">🌟 Toplam Puan</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="supportScore">5.0%</div>
+                    <div class="stat-label">✓ Destek Skoru</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="uploadedCount">3</div>
+                    <div class="stat-label">📤 Yüklediklerim</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="completedCount">0</div>
+                    <div class="stat-label">✅ Doğruladıklarım</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="membershipDate">Mayıs 2026</div>
+                    <div class="stat-label">📅 Üyelik Tarihi</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="ranking">#1,254</div>
+                    <div class="stat-label">🏅 Sıralamanız</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: UYGULAMALARIM -->
+        <div class="tab-content" id="tabApps">
+            <div class="info-box">
+                <strong>💡 Bilgi:</strong> Test etmek istediğiniz uygulamaları buradan yönetebilirsiniz.
+            </div>
+            <div class="apps-section">
+                <h3 class="apps-title">🟢 Aktif Uygulamalar (3 aktif • 0 tamamlandı)</h3>
+                <div class="apps-list" id="appsList">
+                    <div class="app-item">
+                        <div class="app-header">
+                            <div class="app-icon">🐾</div>
+                            <span class="app-status">Aktif</span>
+                        </div>
+                        <h4 class="app-name">PawPal: Pati Arkadaşı</h4>
+                        <p class="app-package">com.altun.pawpal</p>
+                        <div class="app-progress">
+                            <div class="app-progress-bar" style="width: 0%"></div>
+                        </div>
+                        <div class="app-details">
+                            <span>📅 14 gün</span>
+                            <span>👥 0 tester</span>
+                        </div>
+                    </div>
+
+                    <div class="app-item">
+                        <div class="app-header">
+                            <div class="app-icon">🕌</div>
+                            <span class="app-status">Aktif</span>
+                        </div>
+                        <h4 class="app-name">Mikat: NAMAZ VAKİTLERİ</h4>
+                        <p class="app-package">com.altun.mikat</p>
+                        <div class="app-progress">
+                            <div class="app-progress-bar" style="width: 0%"></div>
+                        </div>
+                        <div class="app-details">
+                            <span>📅 14 gün</span>
+                            <span>👥 0 tester</span>
+                        </div>
+                    </div>
+
+                    <div class="app-item">
+                        <div class="app-header">
+                            <div class="app-icon">💧</div>
+                            <span class="app-status">Aktif</span>
+                        </div>
+                        <h4 class="app-name">İnver Water</h4>
+                        <p class="app-package">com.inver.water</p>
+                        <div class="app-progress">
+                            <div class="app-progress-bar" style="width: 0%"></div>
+                        </div>
+                        <div class="app-details">
+                            <span>📅 14 gün</span>
+                            <span>👥 0 tester</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: İŞLEM GEÇMİŞİ -->
+        <div class="tab-content" id="tabHistory">
+            <div class="info-box">
+                <strong>💡 Bilgi:</strong> Tüm puan işlemlerinizin geçmişini burada görebilirsiniz.
+            </div>
+            <div class="apps-section">
+                <h3 class="apps-title">📜 Son İşlemler</h3>
+                <div style="display: grid; gap: 1rem;">
+                    <div style="background: linear-gradient(135deg, #0a1f1f 0%, #1a3535 100%); border: 2px solid rgba(0, 255, 65, 0.3); border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <p style="color: var(--accent); font-weight: 600; margin-bottom: 0.25rem;">
+                                ⬆️ PawPal: Pati Arkadaşınızın yüklendi
+                            </p>
+                            <p style="color: var(--text-muted); font-size: 0.85rem;">19.05.2026</p>
+                        </div>
+                        <span style="color: var(--danger); font-weight: 600;">-50</span>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, #0a1f1f 0%, #1a3535 100%); border: 2px solid rgba(0, 255, 65, 0.3); border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <p style="color: var(--accent); font-weight: 600; margin-bottom: 0.25rem;">
+                                ⬆️ Mikat: NAMAZ VAKİTLERİ yüklendi
+                            </p>
+                            <p style="color: var(--text-muted); font-size: 0.85rem;">19.05.2026</p>
+                        </div>
+                        <span style="color: var(--danger); font-weight: 600;">-50</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: SKOR SIRALAMASI -->
+        <div class="tab-content" id="tabRanking">
+            <div class="info-box">
+                <strong>💡 Bilgi:</strong> Diğer testerler arasında sıralanmanızı görmek için burayı kontrol edin.
+            </div>
+            <div class="apps-section">
+                <h3 class="apps-title">🏆 Top 10 Testerler</h3>
+                <div style="display: grid; gap: 1rem;">
+                    <div style="background: linear-gradient(135deg, #1a3535 0%, #0a1f1f 100%); border: 2px solid var(--accent); border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary-dark);">🥇</div>
+                            <div>
+                                <p style="color: var(--accent); font-weight: 600;">TesterKing</p>
+                                <p style="color: var(--text-muted); font-size: 0.85rem;">Admin</p>
+                            </div>
+                        </div>
+                        <span style="background: var(--accent); color: var(--primary-dark); padding: 8px 16px; border-radius: 8px; font-weight: 600;">5,250 puan</span>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, #1a3535 0%, #0a1f1f 100%); border: 2px solid var(--border-color); border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary-dark);">🥈</div>
+                            <div>
+                                <p style="color: var(--accent); font-weight: 600;">TestMaster99</p>
+                                <p style="color: var(--text-muted); font-size: 0.85rem;">Deneyimli</p>
+                            </div>
+                        </div>
+                        <span style="background: var(--accent); color: var(--primary-dark); padding: 8px 16px; border-radius: 8px; font-weight: 600;">4,120 puan</span>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, #1a3535 0%, #0a1f1f 100%); border: 2px solid var(--accent); border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary-dark);">#1254</div>
+                            <div>
+                                <p style="color: var(--accent); font-weight: 600;">ByAltun</p>
+                                <p style="color: var(--text-muted); font-size: 0.85rem;">👈 Siz</p>
+                            </div>
+                        </div>
+                        <span style="background: var(--accent); color: var(--primary-dark); padding: 8px 16px; border-radius: 8px; font-weight: 600;">150 puan</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cloudflare Worker Configuration
+        const WORKER_URL = 'https://bytester-backend.bytesterr.workers.dev';
+        const KV_NAMESPACE = 'bytester_kv';
+        const D1_DATABASE = 'bytester';
+
+        let currentUser = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkUserSession();
+        });
+
+        // API Functions - Cloudflare Worker Integration
+        async function apiCall(endpoint, method = 'GET', body = null) {
+            try {
+                const options = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': currentUser ? `Bearer ${currentUser.token}` : ''
+                    }
+                };
+                
+                if (body) options.body = JSON.stringify(body);
+                
+                const response = await fetch(`${WORKER_URL}${endpoint}`, options);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'API Hatası');
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                return null;
+            }
+        }
+
+        // Save to KV Store
+        async function saveToKV(key, value) {
+            return await apiCall('/api/kv/set', 'POST', { key, value });
+        }
+
+        // Get from KV Store
+        async function getFromKV(key) {
+            return await apiCall(`/api/kv/get?key=${key}`);
+        }
+
+        // Save to D1 Database
+        async function saveToD1(table, data) {
+            return await apiCall('/api/d1/insert', 'POST', { table, data });
+        }
+
+        // Auth Functions
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.add('active');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('active');
+        }
+
+        function showRegisterModal() {
+            document.getElementById('registerModal').classList.add('active');
+        }
+
+        function closeRegisterModal() {
+            document.getElementById('registerModal').classList.remove('active');
+        }
+
+        function toggleForms() {
+            const loginModal = document.getElementById('loginModal');
+            const registerModal = document.getElementById('registerModal');
+
+            if (loginModal.classList.contains('active')) {
+                closeLoginModal();
+                showRegisterModal();
+            } else {
+                closeRegisterModal();
+                showLoginModal();
+            }
+        }
+
+        document.addEventListener('click', (e) => {
+            const loginModal = document.getElementById('loginModal');
+            const registerModal = document.getElementById('registerModal');
+
+            if (e.target === loginModal) closeLoginModal();
+            if (e.target === registerModal) closeRegisterModal();
+        });
+
+        // Validation
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function isValidPhone(phone) {
+            return /^[\d\s\+\-\(\)]{10,}$/.test(phone);
+        }
+
+        // Login Handler
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            document.querySelectorAll('#loginModal .error-msg').forEach(el => el.style.display = 'none');
+            document.getElementById('loginSuccess').style.display = 'none';
+
+            let hasError = false;
+
+            if (!isValidEmail(email)) {
+                document.getElementById('loginEmailError').textContent = 'Geçerli bir email giriniz';
+                document.getElementById('loginEmailError').style.display = 'block';
+                hasError = true;
+            }
+
+            if (password.length < 6) {
+                document.getElementById('loginPasswordError').textContent = 'Şifre en az 6 karakter olmalıdır';
+                document.getElementById('loginPasswordError').style.display = 'block';
+                hasError = true;
+            }
+
+            if (hasError) return;
+
+            // Call Worker API for login
+            const result = await apiCall('/api/auth/login', 'POST', { email, password });
+
+            if (result && result.success) {
+                currentUser = result.user;
+                localStorage.setItem('bytesterUser', JSON.stringify(currentUser));
+                document.getElementById('loginSuccess').style.display = 'block';
+                
+                setTimeout(() => {
+                    closeLoginModal();
+                    showDashboard();
+                }, 1500);
+            } else {
+                document.getElementById('loginPasswordError').textContent = result?.error || 'Giriş başarısız';
+                document.getElementById('loginPasswordError').style.display = 'block';
+            }
+        }
+
+        // Register Handler
+        async function handleRegister(e) {
+            e.preventDefault();
+
+            const fullName = document.getElementById('fullName').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const country = document.getElementById('country').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const termsAgree = document.getElementById('termsAgree').checked;
+
+            document.querySelectorAll('#registerModal .error-msg').forEach(el => el.style.display = 'none');
+            document.getElementById('registerSuccess').style.display = 'none';
+
+            let hasError = false;
+
+            if (fullName.length < 3) {
+                document.getElementById('fullNameError').textContent = 'Ad soyad en az 3 karakter olmalıdır';
+                document.getElementById('fullNameError').style.display = 'block';
+                hasError = true;
+            }
+
+            if (username.length < 3) {
+                document.getElementById('usernameError').textContent = 'Kullanıcı adı en az 3 karakter olmalıdır';
+                document.getElementById('usernameError').style.display = 'block';
+                hasError = true;
+            }
+
+            if (!isValidEmail(email)) {
+                document.getElementById('registerEmailError').textContent = 'Geçerli bir email giriniz';
+                document.getElementById('registerEmailError').style.display = 'block';
+                hasError = true;
+            }
+
+            if (!isValidPhone(phone)) {
+                document.getElementById('phoneError').textContent = 'Geçerli bir telefon numarası giriniz';
+                document.getElementById('phoneError').style.display = 'block';
+                hasError = true;
+            }
+
+            if (password.length < 6) {
+                document.getElementById('registerPasswordError').textContent = 'Şifre en az 6 karakter olmalıdır';
+                document.getElementById('registerPasswordError').style.display = 'block';
+                hasError = true;
+            }
+
+            if (password !== confirmPassword) {
+                document.getElementById('confirmPasswordError').textContent = 'Şifreler eşleşmiyor';
+                document.getElementById('confirmPasswordError').style.display = 'block';
+                hasError = true;
+            }
+
+            if (!termsAgree) {
+                alert('Kullanım şartlarını kabul etmelisiniz');
+                hasError = true;
+            }
+
+            if (hasError) return;
+
+            // Call Worker API for register
+            const result = await apiCall('/api/auth/register', 'POST', {
+                fullName,
+                username,
+                email,
+                phone,
+                country,
+                password
+            });
+
+            if (result && result.success) {
+                document.getElementById('registerSuccess').style.display = 'block';
+                
+                setTimeout(() => {
+                    closeRegisterModal();
+                    showLoginModal();
+                }, 1500);
+            } else {
+                alert(result?.error || 'Kayıt başarısız');
+            }
+        }
+
+        // Logout Handler
+        function handleLogout() {
+            if (confirm('Çıkış yapmak istediğinize emin misiniz?')) {
+                currentUser = null;
+                localStorage.removeItem('bytesterUser');
+                showHero();
+            }
+        }
+
+        // Display Functions
+        function showHero() {
+            document.getElementById('heroSection').style.display = 'block';
+            document.getElementById('featuresSection').style.display = 'block';
+            document.getElementById('dashboardSection').style.display = 'none';
+            document.getElementById('navbarRight').innerHTML = `
+                <button class="nav-btn" onclick="showLoginModal()">🔓 Giriş Yap</button>
+                <button class="nav-btn" onclick="showRegisterModal()">✨ Kayıt Ol</button>
+            `;
+        }
+
+        function showDashboard() {
+            document.getElementById('heroSection').style.display = 'none';
+            document.getElementById('featuresSection').style.display = 'none';
+            document.getElementById('dashboardSection').style.display = 'block';
+
+            const initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
+            document.getElementById('userAvatar').textContent = initials.substring(0, 2);
+            document.getElementById('userName').textContent = currentUser.username;
+            document.getElementById('userEmail').textContent = currentUser.email;
+            document.getElementById('welcomeText').textContent = `Hoş Geldiniz, ${currentUser.username}!`;
+
+            document.getElementById('totalPoints').textContent = currentUser.totalPoints || 150;
+            document.getElementById('supportScore').textContent = (currentUser.supportScore || 5.0).toFixed(1) + '%';
+            document.getElementById('uploadedCount').textContent = currentUser.uploadedCount || 3;
+            document.getElementById('completedCount').textContent = currentUser.completedCount || 0;
+            document.getElementById('membershipDate').textContent = currentUser.joinDate || 'Mayıs 2026';
+            document.getElementById('ranking').textContent = '#' + (currentUser.ranking || 1254).toLocaleString('tr-TR');
+
+            document.getElementById('navbarRight').innerHTML = `
+                <button class="nav-btn logout" onclick="handleLogout()">🚪 Çıkış Yap</button>
+            `;
+        }
+
+        function checkUserSession() {
+            const saved = localStorage.getItem('bytesterUser');
+            if (saved) {
+                currentUser = JSON.parse(saved);
+                showDashboard();
+            } else {
+                showHero();
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+            const tabId = 'tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function scrollToFeatures() {
+            document.getElementById('featuresSection').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
