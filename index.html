@@ -756,7 +756,6 @@
     </style>
 </head>
 <body>
-    <!-- NAVBAR -->
     <nav class="navbar">
         <div class="logo-section">
             <div class="logo-icon">B</div>
@@ -768,7 +767,6 @@
         </div>
     </nav>
 
-    <!-- HERO SECTION -->
     <div class="container" id="heroSection">
         <div class="hero-section">
             <div class="hero-icon">⚗️</div>
@@ -786,9 +784,8 @@
         </div>
     </div>
 
-    <!-- FEATURES SECTION -->
-    <div class="container">
-        <div id="featuresSection">
+    <div class="container" id="featuresSection">
+        <div>
             <h2 class="section-title">✨ ÖZELLIKLER</h2>
             
             <div class="features-grid">
@@ -820,7 +817,7 @@
                     <div class="feature-icon">📲</div>
                     <h3 class="feature-title">Uygulamalarım</h3>
                     <p class="feature-desc">
-                        Test etmek istediğiniz uygulamaları yönetin ve detaylı bilgilerini görüntüleyin.
+                        Test etmek etmek istediğiniz uygulamaları yönetin ve detaylı bilgilerini görüntüleyin.
                     </p>
                 </div>
 
@@ -843,7 +840,7 @@
         </div>
     </div>
 
-<div class="modal" id="loginModal">
+    <div class="modal" id="loginModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">🔓 GİRİŞ YAP</h2>
@@ -947,267 +944,18 @@
         </div>
     </div>
 
-    <script>
-        const WORKER_URL = 'https://bytester-backend.bytesterr.workers.dev';
-        let currentUser = null;
-
-        /**
-         * 🔓 MODAL KAPATMA VE HATA TEMİZLEME FONKSİYONLARI
-         */
-        function closeLoginModal() {
-            document.getElementById('loginModal').style.display = 'none';
-            clearAuthErrors();
-        }
-
-        function closeRegisterModal() {
-            document.getElementById('registerModal').style.display = 'none';
-            clearAuthErrors();
-        }
-
-        function clearAuthErrors() {
-            // Tüm error-msg div'lerini ve başarı mesajlarını temizler
-            document.querySelectorAll('.error-msg').forEach(el => el.textContent = '');
-            document.getElementById('loginSuccess').style.display = 'none';
-            document.getElementById('registerSuccess').style.display = 'none';
-        }
-
-        /**
-         * 🔄 FORMLAR ARASI GEÇİŞ (Giriş Yap <-> Kayıt Ol)
-         */
-        function toggleForms() {
-            const loginModal = document.getElementById('loginModal');
-            const registerModal = document.getElementById('registerModal');
-            
-            clearAuthErrors();
-            
-            if (loginModal.style.display === 'none' || loginModal.style.display === '') {
-                loginModal.style.display = 'flex';
-                registerModal.style.display = 'none';
-            } else {
-                loginModal.style.display = 'none';
-                registerModal.style.display = 'flex';
-            }
-        }
-
-        /**
-         * 🔑 BACKEND GİRİŞ SÜRECİ (LOGIN)
-         */
-        async function handleLogin(event) {
-            if (event) event.preventDefault();
-            clearAuthErrors();
-
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            const rememberMe = document.getElementById('rememberMe').checked;
-            
-            const emailError = document.getElementById('loginEmailError');
-            const passwordError = document.getElementById('loginPasswordError');
-            const successMsg = document.getElementById('loginSuccess');
-            const submitBtn = event.target.querySelector('.btn-submit');
-
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Giriş Yapılıyor...';
-            }
-
-            try {
-                const response = await fetch(`${WORKER_URL}/api/auth/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    if (data.error === 'banned') {
-                        emailError.textContent = 'Bu hesap sistemden yasaklanmıştır.';
-                    } else if (data.message && data.message.toLowerCase().includes('password')) {
-                        passwordError.textContent = 'Girdiğiniz şifre hatalı.';
-                    } else {
-                        emailError.textContent = data.message || 'E-posta veya şifre hatalı.';
-                    }
-                    throw new Error(data.message || 'Giriş başarısız.');
-                }
-
-                // Giriş Başarılı
-                successMsg.style.display = 'block';
-                
-                currentUser = {
-                    id: data.user.id,
-                    username: data.user.username,
-                    email: data.user.email,
-                    points: data.user.points,
-                    supportScore: data.user.supportScore,
-                    uploadedCount: data.user.appsUploaded,
-                    completedCount: data.user.appsVerified,
-                    joinDate: new Date(data.user.createdAt).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long' }),
-                    token: data.token
-                };
-
-                // Beni Hatırla durumuna göre hafıza seçimi
-                if (rememberMe) {
-                    localStorage.setItem('bytesterUser', JSON.stringify(currentUser));
-                } else {
-                    sessionStorage.setItem('bytesterUser', JSON.stringify(currentUser));
-                }
-
-                setTimeout(() => {
-                    closeLoginModal();
-                    if (typeof showDashboard === 'function') {
-                        showDashboard();
-                    } else {
-                        window.location.reload();
-                    }
-                }, 1200);
-
-            } catch (error) {
-                console.error('Giriş Hatası:', error);
-            } finally {
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Giriş Yap';
-                }
-            }
-        }
-
-        /**
-         * ✨ BACKEND KAYIT SÜRECİ (REGISTER)
-         */
-        async function handleRegister(event) {
-            if (event) event.preventDefault();
-            clearAuthErrors();
-
-            const username = document.getElementById('username').value.trim();
-            const email = document.getElementById('registerEmail').value.trim();
-            const password = document.getElementById('registerPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const termsAgree = document.getElementById('termsAgree').checked;
-
-            const usernameError = document.getElementById('usernameError');
-            const emailError = document.getElementById('registerEmailError');
-            const passwordError = document.getElementById('registerPasswordError');
-            const confirmPasswordError = document.getElementById('confirmPasswordError');
-            const successMsg = document.getElementById('registerSuccess');
-            const submitBtn = event.target.querySelector('.btn-submit');
-
-            // Ön yüz kontrolleri (Worker kuralları ile tam eşleşen)
-            if (username.length < 3 || username.length > 30) {
-                usernameError.textContent = 'Kullanıcı adı 3-30 karakter arasında olmalıdır.';
-                return;
-            }
-
-            if (password.length < 8) {
-                passwordError.textContent = 'Şifre en az 8 karakter olmalıdır.';
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                confirmPasswordError.textContent = 'Şifreler uyuşmuyor, lütfen tekrar kontrol edin.';
-                return;
-            }
-
-            if (!termsAgree) {
-                alert('Devam etmek için şartları kabul etmelisiniz.');
-                return;
-            }
-
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Hesap Oluşturuluyor...';
-            }
-
-            try {
-                // Cloudflare Worker'ın beklediği veri yapısı (Payload)
-                const payload = {
-                    email: email,
-                    username: username,
-                    password: password,
-                    agreedToTerms: termsAgree
-                };
-
-                const response = await fetch(`${WORKER_URL}/api/auth/register`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    // Çakışma durumlarını ilgili girdilerin altında gösteriyoruz
-                    if (data.message && data.message.toLowerCase().includes('email')) {
-                        emailError.textContent = 'Bu e-posta adresi zaten kayıtlı.';
-                    } else if (data.message && data.message.toLowerCase().includes('username')) {
-                        usernameError.textContent = 'Bu kullanıcı adı zaten alınmış.';
-                    } else {
-                        usernameError.textContent = data.message || 'Kayıt başarısız oldu.';
-                    }
-                    throw new Error(data.message || 'Kayıt hatası.');
-                }
-
-                // Kayıt Başarılı
-                successMsg.style.display = 'block';
-                event.target.reset();
-
-                // 2 saniye sonra otomatik giriş formuna yönlendir
-                setTimeout(() => {
-                    toggleForms();
-                }, 2000);
-
-            } catch (error) {
-                console.error('Kayıt Hatası:', error);
-            } finally {
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Kayıt Ol';
-                }
-            }
-        }
-
-        /**
-         * 🔄 SAYFA YÜKLENDİĞİNDE OTURUM KONTROLÜ
-         */
-        function checkUserSession() {
-            const savedLocal = localStorage.getItem('bytesterUser');
-            const savedSession = sessionStorage.getItem('bytesterUser');
-            const saved = savedLocal || savedSession;
-
-            if (saved) {
-                currentUser = JSON.parse(saved);
-                if (typeof showDashboard === 'function') {
-                    showDashboard();
-                }
-            } else {
-                if (typeof showHero === 'function') {
-                    showHero();
-                }
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', checkUserSession);
-    </script>
-    <!-- DASHBOARD SECTION -->
-    <div class="container" id="dashboardSection">
+    <div class="container" id="dashboardSection" class="dashboard-section">
         <div class="dashboard-header">
             <h1 class="welcome-text" id="welcomeText">Hoş Geldiniz!</h1>
             <button class="nav-btn logout" onclick="handleLogout()">🚪 Çıkış Yap</button>
         </div>
 
-        <!-- USER CARD -->
         <div class="user-card">
             <div class="avatar" id="userAvatar">BA</div>
             <p class="user-name" id="userName">ByAltun</p>
             <p class="user-email" id="userEmail">byaltun@bytester.com</p>
         </div>
 
-        <!-- TABS -->
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('overview')">📊 Genel Bakış</button>
             <button class="tab-btn" onclick="switchTab('apps')">📱 Uygulamalarım</button>
@@ -1215,7 +963,6 @@
             <button class="tab-btn" onclick="switchTab('ranking')">🏆 Sıralama</button>
         </div>
 
-        <!-- TAB: OVERVIEW -->
         <div class="tab-content active" id="tabOverview">
             <div class="stats-grid">
                 <div class="stat-card">
@@ -1239,19 +986,18 @@
                     <div class="stat-label">📅 Üyelik Tarihi</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="ranking">#1,254</div>
+                    <div class="stat-value" id="userRanking">#1,254</div>
                     <div class="stat-label">🏅 Sıralamanız</div>
                 </div>
             </div>
         </div>
 
-        <!-- TAB: UYGULAMALARIM -->
         <div class="tab-content" id="tabApps">
             <div class="info-box">
                 <strong>💡 Bilgi:</strong> Test etmek istediğiniz uygulamaları buradan yönetebilirsiniz.
             </div>
             <div class="apps-section">
-                <h3 class="apps-title">🟢 Aktif Uygulamalar (3 aktif • 0 tamamlandı)</h3>
+                <h3 class="apps-title" id="appsTitle">🟢 Aktif Uygulamalar (3 aktif • 0 tamamlandı)</h3>
                 <div class="apps-list" id="appsList">
                     <div class="app-item">
                         <div class="app-header">
@@ -1304,18 +1050,17 @@
             </div>
         </div>
 
-        <!-- TAB: İŞLEM GEÇMİŞİ -->
         <div class="tab-content" id="tabHistory">
             <div class="info-box">
                 <strong>💡 Bilgi:</strong> Tüm puan işlemlerinizin geçmişini burada görebilirsiniz.
             </div>
             <div class="apps-section">
                 <h3 class="apps-title">📜 Son İşlemler</h3>
-                <div style="display: grid; gap: 1rem;">
+                <div id="liveHistoryContainer" style="display: grid; gap: 1rem;">
                     <div style="background: linear-gradient(135deg, #0a1f1f 0%, #1a3535 100%); border: 2px solid rgba(0, 255, 65, 0.3); border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
                         <div>
                             <p style="color: var(--accent); font-weight: 600; margin-bottom: 0.25rem;">
-                                ⬆️ PawPal: Pati Arkadaşınızın yüklendi
+                                ⬆️ PawPal: Pati Arkadaşınız yüklendi
                             </p>
                             <p style="color: var(--text-muted); font-size: 0.85rem;">19.05.2026</p>
                         </div>
@@ -1335,14 +1080,13 @@
             </div>
         </div>
 
-        <!-- TAB: SKOR SIRALAMASI -->
         <div class="tab-content" id="tabRanking">
             <div class="info-box">
                 <strong>💡 Bilgi:</strong> Diğer testerler arasında sıralanmanızı görmek için burayı kontrol edin.
             </div>
             <div class="apps-section">
                 <h3 class="apps-title">🏆 Top 10 Testerler</h3>
-                <div style="display: grid; gap: 1rem;">
+                <div id="liveRankingContainer" style="display: grid; gap: 1rem;">
                     <div style="background: linear-gradient(135deg, #1a3535 0%, #0a1f1f 100%); border: 2px solid var(--accent); border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary-dark);">🥇</div>
@@ -1367,13 +1111,13 @@
 
                     <div style="background: linear-gradient(135deg, #1a3535 0%, #0a1f1f 100%); border: 2px solid var(--accent); border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
                         <div style="display: flex; align-items: center; gap: 1rem;">
-                            <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary-dark);">#1254</div>
+                            <div style="width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary-dark);" id="userRankBadge">#1254</div>
                             <div>
-                                <p style="color: var(--accent); font-weight: 600;">ByAltun</p>
+                                <p style="color: var(--accent); font-weight: 600;" id="userRankName">ByAltun</p>
                                 <p style="color: var(--text-muted); font-size: 0.85rem;">👈 Siz</p>
                             </div>
                         </div>
-                        <span style="background: var(--accent); color: var(--primary-dark); padding: 8px 16px; border-radius: 8px; font-weight: 600;">150 puan</span>
+                        <span style="background: var(--accent); color: var(--primary-dark); padding: 8px 16px; border-radius: 8px; font-weight: 600;" id="userRankPoints">150 puan</span>
                     </div>
                 </div>
             </div>
@@ -1381,26 +1125,24 @@
     </div>
 
     <script>
-        // Cloudflare Worker Configuration
+        // Cloudflare Worker Yapılandırması
         const WORKER_URL = 'https://bytester-backend.bytesterr.workers.dev';
-        const KV_NAMESPACE = 'bytester_kv';
-        const D1_DATABASE = 'bytester';
-
         let currentUser = null;
 
-        // Initialize
+        // Sayfa yüklendiğinde oturumu kontrol et
         document.addEventListener('DOMContentLoaded', () => {
             checkUserSession();
         });
 
-        // API Functions - Cloudflare Worker Integration
+        // Ortak API İstek Fonksiyonu
         async function apiCall(endpoint, method = 'GET', body = null) {
             try {
                 const options = {
                     method,
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': currentUser ? `Bearer ${currentUser.token}` : ''
+                        'Accept': 'application/json',
+                        'Authorization': currentUser && currentUser.token ? `Bearer ${currentUser.token}` : ''
                     }
                 };
                 
@@ -1409,47 +1151,57 @@
                 const response = await fetch(`${WORKER_URL}${endpoint}`, options);
                 const data = await response.json();
                 
-                if (!response.ok) {
-                    throw new Error(data.error || 'API Hatası');
-                }
-                
-                return data;
+                return { ok: response.ok, data, status: response.status };
             } catch (error) {
-                console.error('API Error:', error);
-                return null;
+                console.error('API Bağlantı Hatası:', error);
+                return { ok: false, data: { error: 'Sunucu bağlantı hatası.' }, status: 500 };
             }
         }
 
-        // Save to KV Store
+        // KV / D1 Uyumluluk Fonksiyonları (İhtiyaç durumları için korundu)
         async function saveToKV(key, value) {
-            return await apiCall('/api/kv/set', 'POST', { key, value });
+            const res = await apiCall('/api/kv/set', 'POST', { key, value });
+            return res.data;
         }
 
-        // Get from KV Store
         async function getFromKV(key) {
-            return await apiCall(`/api/kv/get?key=${key}`);
+            const res = await apiCall(`/api/kv/get?key=${key}`);
+            return res.data;
         }
 
-        // Save to D1 Database
         async function saveToD1(table, data) {
-            return await apiCall('/api/d1/insert', 'POST', { table, data });
+            const res = await apiCall('/api/d1/insert', 'POST', { table, data });
+            return res.data;
         }
 
-        // Auth Functions
+        // Modal Fonksiyonları
         function showLoginModal() {
+            clearAuthErrors();
             document.getElementById('loginModal').classList.add('active');
         }
 
         function closeLoginModal() {
             document.getElementById('loginModal').classList.remove('active');
+            clearAuthErrors();
         }
 
         function showRegisterModal() {
+            clearAuthErrors();
             document.getElementById('registerModal').classList.add('active');
         }
 
         function closeRegisterModal() {
             document.getElementById('registerModal').classList.remove('active');
+            clearAuthErrors();
+        }
+
+        function clearAuthErrors() {
+            document.querySelectorAll('.error-msg').forEach(el => {
+                el.textContent = '';
+                el.style.display = 'none';
+            });
+            document.getElementById('loginSuccess').style.display = 'none';
+            document.getElementById('registerSuccess').style.display = 'none';
         }
 
         function toggleForms() {
@@ -1465,15 +1217,15 @@
             }
         }
 
+        // Dışarı tıklayınca kapanma mantığı
         document.addEventListener('click', (e) => {
             const loginModal = document.getElementById('loginModal');
             const registerModal = document.getElementById('registerModal');
-
             if (e.target === loginModal) closeLoginModal();
             if (e.target === registerModal) closeRegisterModal();
         });
 
-        // Validation
+        // Temel Doğrulamalar
         function isValidEmail(email) {
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         }
@@ -1482,53 +1234,97 @@
             return /^[\d\s\+\-\(\)]{10,}$/.test(phone);
         }
 
-        // Login Handler
+        /**
+         * 🔓 BACKEND GİRİŞ İŞLEMİ (Kullanıcı bilgisi girilmeden paneli asla açmaz)
+         */
         async function handleLogin(e) {
             e.preventDefault();
+            clearAuthErrors();
             
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
 
-            document.querySelectorAll('#loginModal .error-msg').forEach(el => el.style.display = 'none');
-            document.getElementById('loginSuccess').style.display = 'none';
+            const emailError = document.getElementById('loginEmailError');
+            const passwordError = document.getElementById('loginPasswordError');
+            const successMsg = document.getElementById('loginSuccess');
+            const submitBtn = e.target.querySelector('.btn-submit');
 
             let hasError = false;
 
             if (!isValidEmail(email)) {
-                document.getElementById('loginEmailError').textContent = 'Geçerli bir email giriniz';
-                document.getElementById('loginEmailError').style.display = 'block';
+                emailError.textContent = 'Geçerli bir email giriniz';
+                emailError.style.display = 'block';
                 hasError = true;
             }
 
             if (password.length < 6) {
-                document.getElementById('loginPasswordError').textContent = 'Şifre en az 6 karakter olmalıdır';
-                document.getElementById('loginPasswordError').style.display = 'block';
+                passwordError.textContent = 'Şifre en az 6 karakter olmalıdır';
+                passwordError.style.display = 'block';
                 hasError = true;
             }
 
             if (hasError) return;
 
-            // Call Worker API for login
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Giriş Yapılıyor...';
+            }
+
+            // Giriş İsteği
             const result = await apiCall('/api/auth/login', 'POST', { email, password });
 
-            if (result && result.success) {
-                currentUser = result.user;
-                localStorage.setItem('bytesterUser', JSON.stringify(currentUser));
-                document.getElementById('loginSuccess').style.display = 'block';
+            if (result.ok && result.data && result.data.user) {
+                successMsg.style.display = 'block';
+                
+                currentUser = {
+                    id: result.data.user.id,
+                    username: result.data.user.username,
+                    fullName: result.data.user.fullName || result.data.user.username,
+                    email: result.data.user.email,
+                    token: result.data.token
+                };
+
+                // Tercihe göre saklama alanı seçimi
+                if (rememberMe) {
+                    localStorage.setItem('bytesterUser', JSON.stringify(currentUser));
+                } else {
+                    sessionStorage.setItem('bytesterUser', JSON.stringify(currentUser));
+                }
+
+                // Telefondaki tüm verileri web paneline senkronize et
+                await loadLiveUserData();
                 
                 setTimeout(() => {
                     closeLoginModal();
                     showDashboard();
-                }, 1500);
+                }, 1200);
             } else {
-                document.getElementById('loginPasswordError').textContent = result?.error || 'Giriş başarısız';
-                document.getElementById('loginPasswordError').style.display = 'block';
+                const errMsg = result.data?.message || result.data?.error || 'Giriş başarısız';
+                if (errMsg.toLowerCase().includes('password')) {
+                    passwordError.textContent = 'Girdiğiniz şifre hatalı.';
+                    passwordError.style.display = 'block';
+                } else if(result.data?.error === 'banned') {
+                    emailError.textContent = 'Bu hesap sistemden yasaklanmıştır.';
+                    emailError.style.display = 'block';
+                } else {
+                    emailError.textContent = errMsg;
+                    emailError.style.display = 'block';
+                }
+            }
+
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Giriş Yap';
             }
         }
 
-        // Register Handler
+        /**
+         * ✨ GÜVENLİ KAYIT İŞLEMİ (Uygulamayla tam uyumlu payload yapısı)
+         */
         async function handleRegister(e) {
             e.preventDefault();
+            clearAuthErrors();
 
             const fullName = document.getElementById('fullName').value.trim();
             const username = document.getElementById('username').value.trim();
@@ -1539,90 +1335,212 @@
             const confirmPassword = document.getElementById('confirmPassword').value;
             const termsAgree = document.getElementById('termsAgree').checked;
 
-            document.querySelectorAll('#registerModal .error-msg').forEach(el => el.style.display = 'none');
-            document.getElementById('registerSuccess').style.display = 'none';
+            const fullNameError = document.getElementById('fullNameError');
+            const usernameError = document.getElementById('usernameError');
+            const emailError = document.getElementById('registerEmailError');
+            const phoneError = document.getElementById('phoneError');
+            const passwordError = document.getElementById('registerPasswordError');
+            const confirmPasswordError = document.getElementById('confirmPasswordError');
+            const successMsg = document.getElementById('registerSuccess');
+            const submitBtn = e.target.querySelector('.btn-submit');
 
             let hasError = false;
 
             if (fullName.length < 3) {
-                document.getElementById('fullNameError').textContent = 'Ad soyad en az 3 karakter olmalıdır';
-                document.getElementById('fullNameError').style.display = 'block';
+                fullNameError.textContent = 'Ad soyad en az 3 karakter olmalıdır';
+                fullNameError.style.display = 'block';
                 hasError = true;
             }
 
-            if (username.length < 3) {
-                document.getElementById('usernameError').textContent = 'Kullanıcı adı en az 3 karakter olmalıdır';
-                document.getElementById('usernameError').style.display = 'block';
+            if (username.length < 3 || username.length > 30) {
+                usernameError.textContent = 'Kullanıcı adı 3-30 karakter arasında olmalıdır';
+                usernameError.style.display = 'block';
                 hasError = true;
             }
 
             if (!isValidEmail(email)) {
-                document.getElementById('registerEmailError').textContent = 'Geçerli bir email giriniz';
-                document.getElementById('registerEmailError').style.display = 'block';
+                emailError.textContent = 'Geçerli bir email giriniz';
+                emailError.style.display = 'block';
                 hasError = true;
             }
 
             if (!isValidPhone(phone)) {
-                document.getElementById('phoneError').textContent = 'Geçerli bir telefon numarası giriniz';
-                document.getElementById('phoneError').style.display = 'block';
+                phoneError.textContent = 'Geçerli bir telefon numarası giriniz';
+                phoneError.style.display = 'block';
                 hasError = true;
             }
 
-            if (password.length < 6) {
-                document.getElementById('registerPasswordError').textContent = 'Şifre en az 6 karakter olmalıdır';
-                document.getElementById('registerPasswordError').style.display = 'block';
+            if (password.length < 8) {
+                passwordError.textContent = 'Şifre en az 8 karakter olmalıdır';
+                passwordError.style.display = 'block';
                 hasError = true;
             }
 
             if (password !== confirmPassword) {
-                document.getElementById('confirmPasswordError').textContent = 'Şifreler eşleşmiyor';
-                document.getElementById('confirmPasswordError').style.display = 'block';
+                confirmPasswordError.textContent = 'Şifreler eşleşmiyor';
+                confirmPasswordError.style.display = 'block';
                 hasError = true;
             }
 
             if (!termsAgree) {
                 alert('Kullanım şartlarını kabul etmelisiniz');
-                hasError = true;
+                return;
             }
 
             if (hasError) return;
 
-            // Call Worker API for register
-            const result = await apiCall('/api/auth/register', 'POST', {
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Hesap Oluşturuluyor...';
+            }
+
+            // Worker'ın tam kabul ettiği parametre eşleşmesi
+            const registerPayload = {
                 fullName,
                 username,
                 email,
                 phone,
                 country,
-                password
-            });
+                password,
+                agreedToTerms: termsAgree
+            };
 
-            if (result && result.success) {
-                document.getElementById('registerSuccess').style.display = 'block';
+            const result = await apiCall('/api/auth/register', 'POST', registerPayload);
+
+            if (result.ok) {
+                successMsg.style.display = 'block';
+                e.target.reset();
                 
+                // Kayıt olan kullanıcıyı pürüzsüz giriş için Login formuna aktarır
                 setTimeout(() => {
                     closeRegisterModal();
                     showLoginModal();
-                }, 1500);
+                }, 1800);
             } else {
-                alert(result?.error || 'Kayıt başarısız');
+                const msg = result.data?.message || result.data?.error || 'Kayıt başarısız';
+                if (msg.toLowerCase().includes('email')) {
+                    emailError.textContent = 'Bu e-posta adresi zaten kayıtlı.';
+                    emailError.style.display = 'block';
+                } else if (msg.toLowerCase().includes('username')) {
+                    usernameError.textContent = 'Bu kullanıcı adı zaten alınmış.';
+                    usernameError.style.display = 'block';
+                } else {
+                    usernameError.textContent = msg;
+                    usernameError.style.display = 'block';
+                }
+            }
+
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Kayıt Ol';
             }
         }
 
-        // Logout Handler
+        /**
+         * 🔄 TELEFONDA YAPILAN TÜM GÜNCELLEMELERİ VE AYARLARI WEBE ÇEKEN SİSTEM
+         */
+        async function loadLiveUserData() {
+            if (!currentUser || !currentUser.token) return;
+
+            try {
+                // 1. Kullanıcının Güncel Profil ve İstatistik Verilerini Çek (/api/profile)
+                const profileResult = await apiCall('/api/profile', 'GET');
+                if (profileResult.ok && profileResult.data) {
+                    const profile = profileResult.data;
+                    
+                    // Verileri currentUser nesnesine senkronize et
+                    currentUser.totalPoints = profile.points ?? 150;
+                    currentUser.supportScore = profile.supportScore ?? 5.0;
+                    currentUser.uploadedCount = profile.appsUploaded ?? 3;
+                    currentUser.completedCount = profile.appsVerified ?? 0;
+                    currentUser.ranking = profile.ranking ?? 1254;
+                    currentUser.joinDate = profile.createdAt 
+                        ? new Date(profile.createdAt).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long' }) 
+                        : 'Mayıs 2026';
+
+                    // Arayüz elemanlarını canlı güncelle
+                    if(document.getElementById('totalPoints')) document.getElementById('totalPoints').textContent = currentUser.totalPoints;
+                    if(document.getElementById('supportScore')) document.getElementById('supportScore').textContent = (currentUser.supportScore).toFixed(1) + '%';
+                    if(document.getElementById('uploadedCount')) document.getElementById('uploadedCount').textContent = currentUser.uploadedCount;
+                    if(document.getElementById('completedCount')) document.getElementById('completedCount').textContent = currentUser.completedCount;
+                    if(document.getElementById('membershipDate')) document.getElementById('membershipDate').textContent = currentUser.joinDate;
+                    if(document.getElementById('userRanking')) document.getElementById('userRanking').textContent = '#' + (currentUser.ranking).toLocaleString('tr-TR');
+                    
+                    // Sıralama sekmesindeki "Siz" alanını güncelle
+                    if(document.getElementById('userRankPoints')) document.getElementById('userRankPoints').textContent = currentUser.totalPoints + " puan";
+                    if(document.getElementById('userRankBadge')) document.getElementById('userRankBadge').textContent = '#' + currentUser.ranking;
+                }
+
+                // 2. Kullanıcının Mobil/Web Canlı İşlem Geçmişi (/api/notifications)
+                const notifyResult = await apiCall('/api/notifications?limit=10', 'GET');
+                const historyContainer = document.getElementById('liveHistoryContainer');
+                if (notifyResult.ok && notifyResult.data && notifyResult.data.items && historyContainer) {
+                    const items = notifyResult.data.items;
+                    if (items.length > 0) {
+                        historyContainer.innerHTML = items.map(item => `
+                            <div style="background: linear-gradient(135deg, #0a1f1f 0%, #1a3535 100%); border: 2px solid rgba(0, 255, 65, 0.3); border-radius: 12px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <p style="color: var(--accent); font-weight: 600; margin-bottom: 0.25rem;">
+                                        ${item.type === 'verified' ? '✅' : '📦'} ${item.message}
+                                    </p>
+                                    <p style="color: var(--text-muted); font-size: 0.85rem;">${new Date(item.createdAt).toLocaleDateString('tr-TR')}</p>
+                                </div>
+                                <span style="color: ${item.points < 0 ? 'var(--danger)' : 'var(--success)'}; font-weight: 600;">${item.points >= 0 ? '+' : ''}${item.points}</span>
+                            </div>
+                        `).join('');
+                    }
+                }
+
+                // 3. Kullanıcının Aktif Uygulamalarının Canlı Durumu (/api/apps veya uyumlu havuz)
+                const appsResult = await apiCall('/api/apps/my', 'GET'); 
+                const appsList = document.getElementById('appsList');
+                const appsTitle = document.getElementById('appsTitle');
+                if (appsResult.ok && appsResult.data && appsResult.data.apps && appsList) {
+                    const apps = appsResult.data.apps;
+                    const activeCount = apps.filter(a => a.status === 'Aktif' || a.status === 'active').length;
+                    if(appsTitle) appsTitle.textContent = `🟢 Aktif Uygulamalar (${activeCount} aktif • ${apps.length - activeCount} tamamlandı)`;
+                    
+                    if(apps.length > 0) {
+                        appsList.innerHTML = apps.map(app => `
+                            <div class="app-item">
+                                <div class="app-header">
+                                    <div class="app-icon">${app.icon || '📱'}</div>
+                                    <span class="app-status" style="background-color: ${app.status === 'active' || app.status === 'Aktif' ? 'var(--success)' : 'var(--border-color)'}">${app.status || 'Aktif'}</span>
+                                </div>
+                                <h4 class="app-name">${app.name}</h4>
+                                <p class="app-package">${app.package || app.packageName}</p>
+                                <div class="app-progress">
+                                    <div class="app-progress-bar" style="width: ${app.progress || 0}%"></div>
+                                </div>
+                                <div class="app-details">
+                                    <span>📅 ${app.daysLeft || '14'} gün</span>
+                                    <span>👥 ${app.testerCount || 0} tester</span>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch (err) {
+                console.error("Canlı veri senkronizasyon motoru hatası:", err);
+            }
+        }
+
+        // Çıkış İşlemi
         function handleLogout() {
             if (confirm('Çıkış yapmak istediğinize emin misiniz?')) {
                 currentUser = null;
                 localStorage.removeItem('bytesterUser');
+                sessionStorage.removeItem('bytesterUser');
                 showHero();
             }
         }
 
-        // Display Functions
+        // Görünüm Değiştirme Fonksiyonları (Orijinal yapı korundu)
         function showHero() {
             document.getElementById('heroSection').style.display = 'block';
             document.getElementById('featuresSection').style.display = 'block';
             document.getElementById('dashboardSection').style.display = 'none';
+            document.getElementById('dashboardSection').classList.remove('active');
             document.getElementById('navbarRight').innerHTML = `
                 <button class="nav-btn" onclick="showLoginModal()">🔓 Giriş Yap</button>
                 <button class="nav-btn" onclick="showRegisterModal()">✨ Kayıt Ol</button>
@@ -1633,42 +1551,81 @@
             document.getElementById('heroSection').style.display = 'none';
             document.getElementById('featuresSection').style.display = 'none';
             document.getElementById('dashboardSection').style.display = 'block';
+            document.getElementById('dashboardSection').classList.add('active');
 
-            const initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
+            // İsim baş harflerini alma mantığı
+            let initials = "BY";
+            if (currentUser.fullName) {
+                initials = currentUser.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
+            } else if (currentUser.username) {
+                initials = currentUser.username.substring(0, 2).toUpperCase();
+            }
+            
             document.getElementById('userAvatar').textContent = initials.substring(0, 2);
             document.getElementById('userName').textContent = currentUser.username;
             document.getElementById('userEmail').textContent = currentUser.email;
             document.getElementById('welcomeText').textContent = `Hoş Geldiniz, ${currentUser.username}!`;
 
-            document.getElementById('totalPoints').textContent = currentUser.totalPoints || 150;
-            document.getElementById('supportScore').textContent = (currentUser.supportScore || 5.0).toFixed(1) + '%';
-            document.getElementById('uploadedCount').textContent = currentUser.uploadedCount || 3;
-            document.getElementById('completedCount').textContent = currentUser.completedCount || 0;
-            document.getElementById('membershipDate').textContent = currentUser.joinDate || 'Mayıs 2026';
-            document.getElementById('ranking').textContent = '#' + (currentUser.ranking || 1254).toLocaleString('tr-TR');
+            // Verileri yerleştir
+            document.getElementById('totalPoints').textContent = currentUser.totalPoints ?? 150;
+            document.getElementById('supportScore').textContent = (currentUser.supportScore ?? 5.0).toFixed(1) + '%';
+            document.getElementById('uploadedCount').textContent = currentUser.uploadedCount ?? 3;
+            document.getElementById('completedCount').textContent = currentUser.completedCount ?? 0;
+            document.getElementById('membershipDate').textContent = currentUser.joinDate ?? 'Mayıs 2026';
+            document.getElementById('userRanking').textContent = '#' + (currentUser.ranking ?? 1254).toLocaleString('tr-TR');
+            
+            if(document.getElementById('userRankName')) document.getElementById('userRankName').textContent = currentUser.username;
 
             document.getElementById('navbarRight').innerHTML = `
                 <button class="nav-btn logout" onclick="handleLogout()">🚪 Çıkış Yap</button>
             `;
         }
 
+        /**
+         * 🔄 OTURUM GÜVENLİK FİLTRESİ (Sahte/boş açılışları kökten engeller)
+         */
         function checkUserSession() {
-            const saved = localStorage.getItem('bytesterUser');
+            const savedLocal = localStorage.getItem('bytesterUser');
+            const savedSession = sessionStorage.getItem('bytesterUser');
+            const saved = savedLocal || savedSession;
+
             if (saved) {
-                currentUser = JSON.parse(saved);
-                showDashboard();
+                try {
+                    const parsed = JSON.parse(saved);
+                    // Hafızada token veya ID yoksa, ya da tanımsız bir yapıysa temizle ve dışarı at
+                    if (!parsed || !parsed.token || !parsed.id || parsed.username === undefined) {
+                        throw new Error("Geçersiz oturum yapısı.");
+                    }
+                    
+                    currentUser = parsed;
+                    
+                    // Canlı verileri arka planda güncelleyip paneli göster
+                    loadLiveUserData().then(() => {
+                        showDashboard();
+                    });
+                } catch (e) {
+                    console.warn("Eski veya bozuk oturum verisi tespit edildi, temizleniyor.");
+                    localStorage.removeItem('bytesterUser');
+                    sessionStorage.removeItem('bytesterUser');
+                    showHero();
+                }
             } else {
                 showHero();
             }
         }
 
+        // Sekme Değiştirme Fonksiyonu (Orijinal mantık)
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
 
             const tabId = 'tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
-            document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
+            const targetTab = document.getElementById(tabId);
+            if (targetTab) targetTab.classList.add('active');
+            
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
         }
 
         function scrollToFeatures() {
